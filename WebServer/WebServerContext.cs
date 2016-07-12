@@ -9,16 +9,16 @@ namespace WebServer
         #region Automatic Properties
 
         public Guid Id { get; }
-        public HttpListenerContext WebContext { get; }
+        public HttpListenerContext HttpContext { get; }
 
         #endregion
 
         #region Constructors
 
-        internal WebServerContext(HttpListenerContext listener)
+        internal WebServerContext(HttpListenerContext context)
         {
             Id = Guid.NewGuid();
-            WebContext = listener;
+            HttpContext = context;
         }
 
         #endregion
@@ -29,14 +29,14 @@ namespace WebServer
         {
             // Setup response.
             var response = new WebResponse(responseText);
-            WebContext.Response.ContentType = response.ContentType;
-            WebContext.Response.ContentEncoding = response.ContentEncoding;
-            WebContext.Response.ContentLength64 = response.ResponseData.Length;
-            WebContext.Response.OutputStream.Write(response.ResponseData, 0, response.ResponseData.Length);
-            WebContext.Response.StatusCode = response.Status;
+            HttpContext.Response.ContentType = response.ContentType;
+            HttpContext.Response.ContentEncoding = response.ContentEncoding;
+            HttpContext.Response.ContentLength64 = response.ResponseData.Length;
+            HttpContext.Response.OutputStream.Write(response.ResponseData, 0, response.ResponseData.Length);
+            HttpContext.Response.StatusCode = response.Status;
 
             // Send the response.
-            WebContext.Response.OutputStream.Close();
+            HttpContext.Response.OutputStream.Close();
         }
 
         #endregion

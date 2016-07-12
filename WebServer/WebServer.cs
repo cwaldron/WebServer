@@ -174,13 +174,13 @@ namespace WebServer
 
         public static WorkflowState OnAbort(IWorkflowContext<IWebServerContext> context)
         {
-            Console.WriteLine(context.Token.WebContext.Request.RemoteEndPoint + " : " + context.Token.WebContext.Request.RawUrl);
+            Console.WriteLine(context.Token.HttpContext.Request.RemoteEndPoint + " : " + context.Token.HttpContext.Request.RawUrl);
             return WorkflowState.Continue;
         }
 
         public static WorkflowState OnException(IWorkflowContext<IWebServerContext> context)
         {
-            Console.WriteLine(context.Token.WebContext.Request.RemoteEndPoint + " : " + context.Token.WebContext.Request.RawUrl);
+            Console.WriteLine(context.Token.HttpContext.Request.RemoteEndPoint + " : " + context.Token.HttpContext.Request.RawUrl);
             return WorkflowState.Continue;
         }
 

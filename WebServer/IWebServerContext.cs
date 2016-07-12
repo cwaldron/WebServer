@@ -8,7 +8,7 @@ namespace WebServer
     {
         Guid Id { get; }
 
-        HttpListenerContext WebContext { get; }
+        HttpListenerContext HttpContext { get; }
 
         void SendResponseText(string repsonse);
     }

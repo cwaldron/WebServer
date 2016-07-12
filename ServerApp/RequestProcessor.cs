@@ -33,7 +33,7 @@ namespace ServerApp
         /// </summary>
         public static WorkflowState LogIpAddress(IWorkflowContext<IWebServerContext> context)
         {
-            Console.WriteLine(context.Token.WebContext.Request.RemoteEndPoint + " : " + context.Token.WebContext.Request.RawUrl);
+            Console.WriteLine(context.Token.HttpContext.Request.RemoteEndPoint + " : " + context.Token.HttpContext.Request.RawUrl);
             return WorkflowState.Continue;
         }
 
@@ -43,7 +43,7 @@ namespace ServerApp
         public static WorkflowState AuthenticateContext(IWorkflowContext<IWebServerContext> context)
         {
             Console.WriteLine("Authtenticate Context");
-            Console.WriteLine(context.Token.WebContext.Request.RemoteEndPoint + " : " + context.Token.WebContext.Request.RawUrl);
+            Console.WriteLine(context.Token.HttpContext.Request.RemoteEndPoint + " : " + context.Token.HttpContext.Request.RawUrl);
             return WorkflowState.Continue;
         }
 
@@ -52,7 +52,7 @@ namespace ServerApp
         /// </summary>
         public static WorkflowState WhiteList(IWorkflowContext<IWebServerContext> context)
         {
-            string url = context.Token.WebContext.Request.RemoteEndPoint?.ToString();
+            string url = context.Token.HttpContext.Request.RemoteEndPoint?.ToString();
             bool valid = url != null && (url.StartsWith("192.168") || url.StartsWith("127.0.0.1") || url.StartsWith("[::1]"));
             return valid ? WorkflowState.Continue : WorkflowState.Abort;
         }
