@@ -43,6 +43,8 @@
     <Compile Include="Content\FileLoader.cs" />
     <Compile Include="Content\PageLoader.cs" />
     <Compile Include="Content\ImageLoader.cs" />
+    <Compile Include="Utilities\HttpEncoder.cs" />
+    <Compile Include="Utilities\HttpUtility.cs" />
     <Compile Include="WebServerContext.cs" />
     <Compile Include="IWebServerContext.cs" />
     <Compile Include="IWorkflowContext.cs" />
@@ -56,6 +58,8 @@
     <Compile Include="Queueing\RequestManager.cs" />
     <Compile Include="WebServer.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Workflow\ExceptionActivity.cs" />
+    <Compile Include="Workflow\WorkflowException.cs" />
     <Compile Include="Workflow\WorkflowState.cs" />
     <Compile Include="Workflow\WorkflowContext.cs" />
     <Compile Include="Workflow\Workflow.cs" />
