@@ -18,10 +18,8 @@ namespace WebServer
         #region Constructors
 
         /// <summary>
-        /// RequestManager constructor.
+        /// WebContentLoader constructor.
         /// </summary>
-        /// <param name="responseBuilder">response builder</param>
-        /// <param name="threadCount">thread count</param>
         public WebContentLoader()
         {
             _contentLoaders = new Dictionary<string, Tuple<string, IContentLoader>>
@@ -84,12 +82,7 @@ namespace WebServer
         public string FindContentType(string contentKey)
         {
             Tuple<string, IContentLoader> contentPair;
-            if (_contentLoaders.TryGetValue(contentKey, out contentPair))
-            {
-                return contentPair.Item1;
-            }
-
-            return null;
+            return _contentLoaders.TryGetValue(contentKey, out contentPair) ? contentPair.Item1 : null;
         }
 
         /// <summary>
@@ -102,7 +95,7 @@ namespace WebServer
         {
             var contentKey = Path.GetExtension(pathName);
             Tuple<string, IContentLoader> contentPair;
-            if (_contentLoaders.TryGetValue(contentKey, out contentPair))
+            if (contentKey != null && _contentLoaders.TryGetValue(contentKey, out contentPair))
             {
                 return contentPair.Item2.LoadContent(content, pathName, contentKey);
             }

@@ -13,8 +13,8 @@ namespace WebServer.Queueing
 
         private readonly IList<RequestQueue<T>> _requestWorkers;
         private const int DefaultWorkerThreads = 25;
-        private int _threadIndex = 0;
-        private int _threadCount;
+        private readonly int _threadCount;
+        private int _threadIndex;
         private bool _disposed;
 
         #endregion
