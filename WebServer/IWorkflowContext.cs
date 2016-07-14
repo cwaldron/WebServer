@@ -3,7 +3,7 @@ using WebServer.Workflow;
 
 namespace WebServer
 {
-    public interface IWorkflowContext<T>
+    public interface IWorkflowContext<out T>
     {
         Guid Id { get; }
 

@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Net;
 using System.Linq;
+using WebServer.Sessions;
 using WebServer.Utilities;
 
 namespace WebServer
@@ -12,19 +13,22 @@ namespace WebServer
 
         public Guid Id { get; }
         public HttpListenerContext HttpContext { get; }
+        public SessionManager SessionManager { get; }
 
         #endregion
 
         #region Constructors
-        
+
         /// <summary>
-        /// 
+        /// WebServerContext constructor.
         /// </summary>
-        /// <param name="listener"></param>
-        internal WebServerContext(HttpListenerContext listener)
+        /// <param name="listener">http listner</param>
+        /// <param name="sessionManager">session manager</param>
+        internal WebServerContext(HttpListenerContext listener, SessionManager sessionManager)
         {
             Id = Guid.NewGuid();
             HttpContext = listener;
+            SessionManager = sessionManager;
         }
 
         #endregion

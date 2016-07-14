@@ -4,6 +4,7 @@ using System.Diagnostics;
 using System.Net;
 using System.Threading.Tasks;
 using WebServer.Queueing;
+using WebServer.Sessions;
 using WebServer.Workflow;
 
 namespace WebServer
@@ -14,8 +15,18 @@ namespace WebServer
 
         private readonly HttpListener _listener;
         private readonly RequestManager<IWebServerContext> _requestManager;
+        private readonly SessionManager _sessionManager;
         private Workflow<IWebServerContext> _workflow; 
         private bool _disposed;
+
+        #endregion
+
+        #region Properties
+
+        /// <summary>
+        /// Determines if the webserver is listening for requests.
+        /// </summary>
+        public bool IsListening => _listener.IsListening;
 
         #endregion
 
@@ -38,6 +49,9 @@ namespace WebServer
             {
                 throw new ArgumentException("prefixes");
             }
+
+            // Setup session manager.
+            _sessionManager = new SessionManager();
 
             // Setup abort and exception handlers.
             var processor = requestProcessor ?? this;
@@ -80,15 +94,6 @@ namespace WebServer
 
         #endregion
 
-        #region Properties
-        
-        /// <summary>
-        /// Determines if the webserver is listening for requests.
-        /// </summary>
-        public bool IsListening => _listener.IsListening;
-
-        #endregion
-
         #region Methods
 
         /// <summary>
@@ -102,7 +107,7 @@ namespace WebServer
                 {
                     try
                     {
-                        _requestManager.Process(new WebServerContext(_listener.GetContext()));
+                        _requestManager.Process(new WebServerContext(_listener.GetContext(), _sessionManager));
                     }
                     catch (HttpListenerException)
                     {
@@ -131,20 +136,20 @@ namespace WebServer
         /// <summary>
         /// Default abort handler.
         /// </summary>
-        /// <param name="context"></param>
-        /// <param name="ex"></param>
+        /// <param name="context">workflow context</param>
+        /// <param name="ex">workflow abort exception</param>
         public static void AbortHandler(IWorkflowContext<IWebServerContext> context, Exception ex)
         {
             // TODO: need send response to set status code.
-            Console.WriteLine("Aborting request");
+            Console.WriteLine(@"Aborting request");
             context.Token.SendResponseText($"Web Server Abort: {ex.Message}"); 
         }
 
         /// <summary>
         /// Default exception handler.
         /// </summary>
-        /// <param name="context"></param>
-        /// <param name="ex"></param>
+        /// <param name="context">workflow context</param>
+        /// <param name="ex">exception</param>
         public static void ExceptionHandler(IWorkflowContext<IWebServerContext> context, Exception ex)
         {
             // TODO: need send response to set status code.

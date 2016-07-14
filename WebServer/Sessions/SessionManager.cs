@@ -3,7 +3,7 @@ using System.Collections.Concurrent;
 
 namespace WebServer.Sessions
 {
-    internal class SessionManager : SingletonBase<SessionManager>
+    public class SessionManager
     {
         #region Private Members
 
@@ -27,7 +27,7 @@ namespace WebServer.Sessions
             var session = new Session();
             if (!_sessions.TryAdd(session.Id, session))
             {
-                Console.WriteLine("Adding new session failed when it should have succeeded");
+                Console.WriteLine(@"Adding new session failed when it should have succeeded");
                 return null;
             }
             return session;

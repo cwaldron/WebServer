@@ -34,7 +34,7 @@ namespace ServerApp
         public static void LogIpAddress(IWorkflowContext<IWebServerContext> context)
         {
             Console.WriteLine("{remoteEndPoint} : {rawUrl}".Render(new { remoteEndPoint = context.Token.HttpContext.Request.RemoteEndPoint, rawUrl = context.Token.HttpContext.Request.RawUrl }));
-            Console.WriteLine(context.Token.HttpContext.Request.RemoteEndPoint + " : " + context.Token.HttpContext.Request.RawUrl);
+            Console.WriteLine(context.Token.HttpContext.Request.RemoteEndPoint + @" : " + context.Token.HttpContext.Request.RawUrl);
         }
 
         /// <summary>
@@ -42,8 +42,8 @@ namespace ServerApp
         /// </summary>
         public static void AuthenticateContext(IWorkflowContext<IWebServerContext> context)
         {
-            Console.WriteLine("Authtenticate Context");
-            Console.WriteLine(context.Token.HttpContext.Request.RemoteEndPoint + " : " + context.Token.HttpContext.Request.RawUrl);
+            Console.WriteLine(@"Authtenticate Context");
+            Console.WriteLine(context.Token.HttpContext.Request.RemoteEndPoint + @" : " + context.Token.HttpContext.Request.RawUrl);
         }
 
         /// <summary>
@@ -79,7 +79,7 @@ namespace ServerApp
         /// <returns>workflow state</returns>
         public static void Response(IWorkflowContext<IWebServerContext> context)
         {
-            Console.WriteLine("In Response");
+            Console.WriteLine(@"In Response");
             Console.WriteLine($"Request Verb = '{context.Token.GetRequestVerb()}'");
             context.Token.SendResponseText($"<HTML><BODY>My web page.<br>{DateTime.Now}</BODY></HTML>");
         }
