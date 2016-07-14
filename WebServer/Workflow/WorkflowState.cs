@@ -6,6 +6,11 @@
     public enum WorkflowState
     {
         /// <summary>
+        /// Terminate execution of the workflow.
+        /// </summary>
+        Abort,
+
+        /// <summary>
         /// Continue with the execution of the workflow.
         /// </summary>
         Continue,
@@ -15,6 +20,6 @@
         /// is indicating that it has handled the request and there is no further
         /// need for downstream processing.
         /// </summary>
-        Done
+        Finish
     }
 }

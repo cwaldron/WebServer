@@ -44,12 +44,12 @@ namespace WebServer
             var workflow = processor.GetWorkflow();
             if (!workflow.HasAbortHandler)
             {
-                workflow.OnAbort(AbortHandler);
+                workflow.OnAbort(OnAbort);
             }
 
             if (!workflow.HasExceptionHander)
             {
-                workflow.OnException(ExceptionHandler);
+                workflow.OnException(OnException);
             }
 
             // Setup listener.
@@ -119,38 +119,6 @@ namespace WebServer
             _listener.Stop();
         }
 
-        /// <summary>
-        /// Gets the request process workflow.
-        /// </summary>
-        /// <returns>workflow</returns>
-        public Workflow<IWebServerContext> GetWorkflow()
-        {
-            return _workflow ?? (_workflow = new Workflow<IWebServerContext>());
-        }
-
-        /// <summary>
-        /// Default abort handler.
-        /// </summary>
-        /// <param name="context"></param>
-        /// <param name="ex"></param>
-        public static void AbortHandler(IWorkflowContext<IWebServerContext> context, Exception ex)
-        {
-            // TODO: need send response to set status code.
-            Console.WriteLine("Aborting request");
-            context.Token.SendResponseText($"Web Server Abort: {ex.Message}"); 
-        }
-
-        /// <summary>
-        /// Default exception handler.
-        /// </summary>
-        /// <param name="context"></param>
-        /// <param name="ex"></param>
-        public static void ExceptionHandler(IWorkflowContext<IWebServerContext> context, Exception ex)
-        {
-            // TODO: need send response to set status code.
-            context.Token.SendResponseText($"Web Server Exception: {ex.Message}");
-        }
-
         #endregion
 
         #region IDisposable Members
@@ -197,6 +165,23 @@ namespace WebServer
                 UseShellExecute = true
             };
             Process.Start(psi)?.WaitForExit();
+        }
+
+        public Workflow<IWebServerContext> GetWorkflow()
+        {
+            return _workflow ?? (_workflow = new Workflow<IWebServerContext>());
+        }
+
+        public static WorkflowState OnAbort(IWorkflowContext<IWebServerContext> context)
+        {
+            Console.WriteLine(context.Token.HttpContext.Request.RemoteEndPoint + " : " + context.Token.HttpContext.Request.RawUrl);
+            return WorkflowState.Continue;
+        }
+
+        public static WorkflowState OnException(IWorkflowContext<IWebServerContext> context)
+        {
+            Console.WriteLine(context.Token.HttpContext.Request.RemoteEndPoint + " : " + context.Token.HttpContext.Request.RawUrl);
+            return WorkflowState.Continue;
         }
 
         #endregion

@@ -10,7 +10,7 @@ namespace WebServer.Workflow
     {
         #region Private Members
 
-        private readonly Action<IWorkflowContext<T>> _operation;
+        private readonly Func<IWorkflowContext<T>, WorkflowState> _operation;
 
         #endregion
 
@@ -27,7 +27,7 @@ namespace WebServer.Workflow
         /// Activity constructor.
         /// </summary>
         /// <param name="operation">activity operation</param>
-        internal Activity(Action<IWorkflowContext<T>> operation)
+        internal Activity(Func<IWorkflowContext<T>, WorkflowState> operation)
         {
             _operation = operation;
         }
@@ -50,8 +50,7 @@ namespace WebServer.Workflow
         /// <param name="context">context</param>
         internal virtual void Run(IWorkflowContext<T> context)
         {
-            ((WorkflowContext<T>)context).State = WorkflowState.Continue;
-            _operation(context);
+            ((WorkflowContext<T>)context).State = _operation(context);
         }
 
         #endregion

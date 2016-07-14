@@ -22,7 +22,7 @@ namespace ServerApp
         /// <summary>
         /// Gets the request process workflow.
         /// </summary>
-        /// <returns>workflow</returns>
+        /// <returns></returns>
         public Workflow<IWebServerContext> GetWorkflow()
         {
             return _workflow;
@@ -31,57 +31,42 @@ namespace ServerApp
         /// <summary>
         /// A workflow item, implementing a simple instrumentation of the client IP address, port, and URL.
         /// </summary>
-        public static void LogIpAddress(IWorkflowContext<IWebServerContext> context)
+        public static WorkflowState LogIpAddress(IWorkflowContext<IWebServerContext> context)
         {
-            Console.WriteLine("{remoteEndPoint} : {rawUrl}".Render(new { remoteEndPoint = context.Token.HttpContext.Request.RemoteEndPoint, rawUrl = context.Token.HttpContext.Request.RawUrl }));
             Console.WriteLine(context.Token.HttpContext.Request.RemoteEndPoint + " : " + context.Token.HttpContext.Request.RawUrl);
+            return WorkflowState.Continue;
         }
 
         /// <summary>
         /// A workflow item, implementing a simple instrumentation of the client IP address, port, and URL.
         /// </summary>
-        public static void AuthenticateContext(IWorkflowContext<IWebServerContext> context)
+        public static WorkflowState AuthenticateContext(IWorkflowContext<IWebServerContext> context)
         {
             Console.WriteLine("Authtenticate Context");
             Console.WriteLine(context.Token.HttpContext.Request.RemoteEndPoint + " : " + context.Token.HttpContext.Request.RawUrl);
+            return WorkflowState.Continue;
         }
 
         /// <summary>
         /// Only intranet IP addresses are allowed.
         /// </summary>
-        public static void WhiteList(IWorkflowContext<IWebServerContext> context)
+        public static WorkflowState WhiteList(IWorkflowContext<IWebServerContext> context)
         {
             string url = context.Token.HttpContext.Request.RemoteEndPoint?.ToString();
             bool valid = url != null && (url.StartsWith("192.168") || url.StartsWith("127.0.0.1") || url.StartsWith("[::1]"));
-
-            if (!valid)
-                throw new WorkflowAbortException($"Invalid endpoint: {url}");
+            return valid ? WorkflowState.Continue : WorkflowState.Abort;
         }
-
-        /// <summary>
-        /// Only intranet IP addresses are allowed.
-        /// </summary>
-        public static void SessionProvider(IWorkflowContext<IWebServerContext> context)
-        {
-
-            string url = context.Token.HttpContext.Request.RemoteEndPoint?.ToString();
-            bool valid = url != null && (url.StartsWith("192.168") || url.StartsWith("127.0.0.1") || url.StartsWith("[::1]"));
-
-            if (!valid)
-                throw new WorkflowAbortException($"Invalid endpoint: {url}");
-        }
-
 
         /// <summary>
         /// Produce a response.
         /// </summary>
         /// <param name="context"></param>
         /// <returns>workflow state</returns>
-        public static void Response(IWorkflowContext<IWebServerContext> context)
+        public static WorkflowState Response(IWorkflowContext<IWebServerContext> context)
         {
             Console.WriteLine("In Response");
-            Console.WriteLine($"Request Verb = '{context.Token.GetRequestVerb()}'");
             context.Token.SendResponseText($"<HTML><BODY>My web page.<br>{DateTime.Now}</BODY></HTML>");
+            return WorkflowState.Continue;
         }
     }
 }

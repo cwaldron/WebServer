@@ -1,4 +1,8 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
 
 namespace WebServer
 {
@@ -16,7 +20,7 @@ namespace WebServer
         public static string LeftOf(this string src, string s)
         {
             string ret = src;
-            int idx = src.IndexOf(s, StringComparison.Ordinal);
+            int idx = src.IndexOf(s);
             if (idx != -1)
             {
                 ret = src.Substring(0, idx);
@@ -37,7 +41,7 @@ namespace WebServer
         public static string RightOf(this string src, string s)
         {
             string ret = string.Empty;
-            int idx = src.IndexOf(s, StringComparison.Ordinal);
+            int idx = src.IndexOf(s);
             if (idx != -1)
             {
                 ret = src.Substring(idx + s.Length);
