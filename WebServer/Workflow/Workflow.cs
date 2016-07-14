@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
 
 namespace WebServer.Workflow
 {
@@ -13,27 +12,30 @@ namespace WebServer.Workflow
         #region Private Members
 
         private readonly List<Activity<T>> _activities;
-        private Activity<T> _abort;
-        private Activity<T> _exception;
+        private ExceptionActivity<T> _abort;
+        private ExceptionActivity<T> _exception;
 
         #endregion
 
         #region Automatic Properties
 
-        internal bool HasAbortHandler
-        {
-            get { return _abort != null; }
-        }
+        /// <summary>
+        /// Determines the presense of an abort handler.
+        /// </summary>
+        internal bool HasAbortHandler => _abort != null;
 
-        internal bool HasExceptionHander
-        {
-            get { return _exception != null; }
-        }
+        /// <summary>
+        /// Determines the presense of an exception handler.
+        /// </summary>
+        internal bool HasExceptionHander => _exception != null;
 
         #endregion
 
         #region Constructors
 
+        /// <summary>
+        /// Workflow constructor.
+        /// </summary>
         public Workflow()
         {
             _activities = new List<Activity<T>>();
@@ -46,33 +48,33 @@ namespace WebServer.Workflow
         /// <summary>
         /// Do work.
         /// </summary>
-        /// <param name="lambda">function operator</param>
+        /// <param name="action">action operator</param>
         /// <returns>workflow</returns>
-        public Workflow<T> Do(Func<IWorkflowContext<T>, WorkflowState> lambda)
+        public Workflow<T> Do(Action<IWorkflowContext<T>> action)
         {
-            _activities.Add(new Activity<T>(lambda));
+            _activities.Add(new Activity<T>(action));
             return this;
         }
 
         /// <summary>
         /// Do work.
         /// </summary>
-        /// <param name="lambda">function operator</param>
+        /// <param name="action">action operator</param>
         /// <returns>workflow</returns>
-        public Workflow<T> OnAbort(Func<IWorkflowContext<T>, WorkflowState> lambda)
+        public Workflow<T> OnAbort(Action<IWorkflowContext<T>, Exception> action)
         {
-            _abort = new Activity<T>(lambda);
+            _abort = new ExceptionActivity<T>(action);
             return this;
         }
 
         /// <summary>
         /// Do work.
         /// </summary>
-        /// <param name="lambda">function operator</param>
+        /// <param name="action">action operator</param>
         /// <returns>workflow</returns>
-        public Workflow<T> OnException(Func<IWorkflowContext<T>, WorkflowState> lambda)
+        public Workflow<T> OnException(Action<IWorkflowContext<T>, Exception> action)
         {
-            _exception = new Activity<T>(lambda);
+            _exception = new ExceptionActivity<T>(action);
             return this;
         }
 
@@ -82,11 +84,24 @@ namespace WebServer.Workflow
         /// <param name="context"></param>
         internal override void Run (IWorkflowContext<T> context)
         {
-            while (context.Step < _activities.Count)
+            var workflowContext = (WorkflowContext<T>)context;
+
+            try
             {
-                _activities[((WorkflowContext<T>)context).Step++].Run(context);
-                if (context.State == WorkflowState.Abort || context.State == WorkflowState.Finish)
-                    break;
+                while (context.Step < _activities.Count && context.State != WorkflowState.Done)
+                {
+                    _activities[workflowContext.Step++].Run(context);
+                }
+            }
+            catch (WorkflowAbortException ex)
+            {
+                _abort.Run(context, ex);
+                workflowContext.State = WorkflowState.Done;
+            }
+            catch (Exception ex)
+            {
+                _exception.Run(context, ex);
+                workflowContext.State = WorkflowState.Done;
             }
         }
 
