@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq;
 using System.Text;
-using System.Text.RegularExpressions;
 
 namespace WebServer
 {
@@ -73,6 +72,30 @@ namespace WebServer
         /// <returns>
         /// A tuple consisting of the altered format string and a symbol table.
         /// </returns>
+        /// <remarks>
+        /// Parse transition matrix:
+        /// |--------------------------------------------------------------------------|
+        /// |     | \w  | \d  | \s  |  {  |  }  |  :  | eos |  
+        /// |--------------------------------------------------------------------------|
+        /// |  0  |  0  |  0  |  0  |  1  |  A  |  :  | exit|  Initial
+        /// |--------------------------------------------------------------------------|
+        /// |  1  |  2  |  E  |  E  |  0  |  E  |  E  |  E  |  Initial symbol
+        /// |--------------------------------------------------------------------------|
+        /// |  2  |  2  |  2  |  E  |  E  | B/0 | B/3 |  E  |  Build symbol
+        /// |--------------------------------------------------------------------------|
+        /// |  3  |  3  |  3  |  3  |  E  | C/0 |  E  |  E  |  Build format parameter
+        /// |--------------------------------------------------------------------------|
+        /// 
+        /// A)	Lookahead.
+        ///     If character is '}' Then ++index, goto 0
+        ///     Else goto E
+        /// 
+        /// B)	Symbol found.
+        /// 
+        /// C)  Format parameter found.
+        /// 
+        /// E)	Syntax error.
+        /// </remarks>
         private static Tuple<string, List<string>> ParseFormat(string source)
         {
             int state = 0;
