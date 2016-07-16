@@ -8,24 +8,11 @@ using System.Text.RegularExpressions;
 namespace WebServer
 {
     /// <summary>
-    /// The primary class for accessing the functionality of the StringFormat library.
+    /// Extends the string class.
     /// </summary>
     public static class StringExtensions
     {
-        /*
-         * Explanation:
-         * (?<=(^|[^\{]|(\{\{)+)) -- This is a lookback, it says that when the next character in the regex is matched, it should
-         *                          only be considered a match if it is the start of the line, immediately preceded with a non '{' character, or an even number of '{' characters
-         *                          IE: '{one}' and '{{{one}' are both valid (the first two '{' in the second example will result in a single '{'
-         *                              but '{{one}' is not a valid because String.Format will combine the first two '{' into a single one
-         * \{                   --Find a '{' character
-         * (?!\{)               --This is a negative look ahead, it says that after you find a the preceding character,
-         *                          look to make sure it isn't immediately proceeded with another '{'
-         *\w                    --The very next character must be a word character (alpha numeric)
-         *.*                    --Continue reading the string for any non-linebreaking character
-         *?\}                   --Stop reading at the very first '}' character (don't be greedy)
-        */
-        private const string TokenizeRegex = @"(?<=(^|[^\{]|(\{\{)+))\{(?!\{)\w.*?\}";
+        #region Extension Methods
 
         /// <summary>
         /// Renders the string using the placeholder for the property names.
@@ -47,7 +34,7 @@ namespace WebServer
         /// <returns>The rendered string.</returns>
         public static string Render(this string format, IFormatProvider provider, object values = null)
         {
-            return format.Render(provider, AnonymousObjectToDictionary(values));
+            return format.Render(provider, ToObjectMap(values));
         }
 
         /// <summary>
@@ -71,112 +58,162 @@ namespace WebServer
         public static string Render(this string format, IFormatProvider provider, IDictionary<string, object> values)
         {
             if (values == null) return format;
-            IEnumerable<string> tokens;
-            var tokenizedString = TokenizeString(format, out tokens);
-            return string.Format(provider, tokenizedString, tokens.Select(s => values[s]).ToArray());
+            var results = ParseFormat(format);
+            return string.Format(provider, results.Item1, results.Item2.Select(x => values[x]).ToArray());
         }
+
+        #endregion
 
         #region Helpers
 
         /// <summary>
-        /// Returns the format string with the tokens replaced as ordinals. Exposed for developer benefit. Most likely used only in debugging.
+        /// Parse the format string.
         /// </summary>
-        /// <param name="format">The string to format.</param>
-        /// <returns>A string where the tokens are replaced with ordinal values.</returns>
-        private static string TokenizeString(string format)
+        /// <param name="source">source format string</param>
+        /// <returns>
+        /// A tuple consisting of the altered format string and a symbol table.
+        /// </returns>
+        private static Tuple<string, List<string>> ParseFormat(string source)
         {
-            IEnumerable<string> junk;
-            return TokenizeString(format, out junk);
-        }
+            int state = 0;
+            int index = 0;
+            var target = new StringBuilder();
+            var symbol = new StringBuilder();
+            var format = new StringBuilder();
+            var placeholder = 0;
+            var symbolTable = new List<string>();
 
-        /// <summary>
-        /// Returns the format string with the tokens replaced as ordinals. Exposed for developer benefit. Most likely used only in debugging.
-        /// </summary>
-        /// <param name="format">The string to format.</param>
-        /// <param name="tokens">The tokens that were extracted from the format string.</param>
-        /// <returns>A string where the tokens are replaced with ordinal values.</returns>
-        private static string TokenizeString(string format, out IEnumerable<string> tokens)
-        {
-            //performance: minimize the number of times the builder will have to "grow", while keeping the initial size reasonable
-            var sb = new StringBuilder(format.Length);
-
-            var match = Regex.Match(format, TokenizeRegex, RegexOptions.Compiled);
-
-            var tokenList = new List<string>();
-
-            var currentIndex = 0;
-            while (match.Success)
+            while (index < source.Length)
             {
-                sb.Append(format.Substring(currentIndex, match.Index - currentIndex));
-
-                var fullToken = match.ToString();
-
-                var name = ParseName(fullToken);
-
-                var index = IndexOfName(tokenList, name);
-
-                sb.Append(BuildNewToken(fullToken, name, index));
-
-                currentIndex = match.Index + match.Length;
-
-                match = match.NextMatch();
-            }
-
-            tokens = tokenList;
-            sb.Append(format.Substring(currentIndex));
-
-            return sb.ToString();
-        }
-
-        private static string ParseName(string fullToken)
-        {
-            var token = fullToken.Substring(1, fullToken.Length - 2);
-
-            var colonIndex = token.IndexOf(':');
-
-            if (colonIndex >= 0) token = token.Substring(0, colonIndex);
-
-            return token.TrimEnd();
-        }
-
-        private static int IndexOfName(IList<string> names, string name)
-        {
-            var index = names.IndexOf(name);
-
-            if (index < 0)
-            {
-                names.Add(name);
-                index = names.IndexOf(name);
-            }
-
-            return index;
-        }
-
-        private static string BuildNewToken(string fullToken, string name, int index)
-        {
-            fullToken = fullToken.Remove(1, name.Length);
-            return fullToken.Insert(1, index.ToString());
-        }
-
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="values"></param>
-        /// <returns></returns>
-        private static IDictionary<string, object> AnonymousObjectToDictionary(object values)
-        {
-            var valueDictionary = new Dictionary<string, object>();
-            if (values != null)
-            {
-                foreach (PropertyDescriptor propertyDescriptor in TypeDescriptor.GetProperties(values))
+                switch (state)
                 {
-                    valueDictionary.Add(propertyDescriptor.Name, propertyDescriptor.GetValue(values));
+                    case 0: // Initial
+                        if (source[index] == '{')
+                        {
+                            symbol = new StringBuilder();
+                            state = 1;
+                        }
+                        else if (source[index] == '}')
+                        {
+                            if (Lookahead(source, index, '}'))
+                            {
+                                target.Append(source[index++]);
+                            }
+                            else
+                            {
+                                throw new FormatException();
+                            }
+                        }
+
+                        target.Append(source[index]);
+                        index += 1;
+                        continue;
+
+                    case 1: // Start symbol parse.
+                        if (source[index] == '{')
+                        {
+                            target.Append(source[index++]);
+                            state = 0;
+                            continue;
+                        }
+                        if (char.IsLetter(source[index]))
+                        {
+                            state = 2;
+                            symbol.Append(source[index]);
+                            index += 1;
+                            continue;
+                        }
+                        throw new FormatException();
+
+                    case 2: // Build symbol
+                        if (char.IsLetter(source[index]) || char.IsDigit(source[index]))
+                        {
+                            state = 2;
+                            symbol.Append(source[index]);
+                            index += 1;
+                            continue;
+                        }
+
+                        if (source[index] == '}')
+                        {
+                            // Process symbol
+                            symbolTable.Add(symbol.ToString());
+                            target.Append(placeholder++);
+                            target.Append(source[index]);
+                            state = 0;
+                            index += 1;
+                            continue;
+                        }
+
+                        if (source[index] == ':')
+                        {
+                            // Start parse of format parameters
+                            symbolTable.Add(symbol.ToString());
+                            state = 3;
+                            format = new StringBuilder();
+                            index += 1;
+                            continue;
+                        }
+
+                        throw new FormatException();
+
+                    case 3: // Parse format parameters
+                        if (source[index] == '}')
+                        {
+                            // Complete parse of format parameters
+                            target.AppendFormat("{0}:{1}", placeholder++, format);
+                            target.Append(source[index]);
+                            state = 0;
+                            index += 1;
+                            continue;
+                        }
+
+                        format.Append(source[index]);
+                        index += 1;
+                        continue;
+
+                    default: // Invalid state
+                        throw new FormatException();
                 }
             }
-            return valueDictionary;
+
+            if (state != 0)
+                throw new FormatException();
+
+            return new Tuple<string, List<string>>(target.ToString(), symbolTable);
+        }
+
+        /// <summary>
+        /// Lookahead one character.
+        /// </summary>
+        /// <param name="format"></param>
+        /// <param name="index"></param>
+        /// <param name="character"></param>
+        /// <returns></returns>
+        private static bool Lookahead(string format, int index, char character)
+        {
+            return index < format.Length && format[index + 1] == character;
+        }
+
+        /// <summary>
+        /// Converts anonymous object properties to an object map.
+        /// </summary>
+        /// <param name="anonymousObject"></param>
+        /// <returns>object map</returns>
+        private static IDictionary<string, object> ToObjectMap(object anonymousObject)
+        {
+            var objectMap = new Dictionary<string, object>();
+            if (anonymousObject != null)
+            {
+                TypeDescriptor.GetProperties(anonymousObject)
+                    .OfType<PropertyDescriptor>()
+                    .ToList()
+                    .ForEach(x => objectMap.Add(x.Name, x.GetValue(anonymousObject)));
+            }
+
+            return objectMap;
         }
 
         #endregion
     }
-
 }
