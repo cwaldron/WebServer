@@ -50,7 +50,7 @@ namespace WebServer.Sessions
 
         #region Constructors
 
-        public Session()
+        internal Session()
         {
             _properties = new ConcurrentDictionary<string, object>();
             Id = Guid.NewGuid();

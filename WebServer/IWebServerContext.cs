@@ -41,6 +41,12 @@ namespace WebServer
         IReadOnlyDictionary<string, string> GetQueryParameters();
 
         /// <summary>
+        /// Returns the session object.
+        /// </summary>
+        /// <returns>session object</returns>
+        Session GetSession();
+
+        /// <summary>
         /// 
         /// </summary>
         /// <param name="repsonse"></param>

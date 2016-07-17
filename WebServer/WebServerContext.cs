@@ -68,6 +68,26 @@ namespace WebServer
             return HttpUtility.ParseQueryString(HttpContext.Request.Url.Query);
         }
 
+        /// <summary>
+        /// Returns the session object. 
+        /// </summary>
+        /// <returns>session object</returns>
+        public Session GetSession()
+        {
+            var sessionCookie = HttpContext.Request.Cookies["__SESSION_COOKIE__"];
+            Session session;
+            if (sessionCookie == null)
+            {
+                session = SessionManager.CreateSession();
+            }
+            else
+            {
+               
+            }
+
+            return null;
+        }
+
         /// <summary> 
         /// Sets a request header.
         /// </summary>

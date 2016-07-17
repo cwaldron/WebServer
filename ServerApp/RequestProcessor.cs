@@ -1,5 +1,7 @@
 ﻿using System;
+using System.Net;
 using WebServer;
+using WebServer.Sessions;
 using WebServer.Workflow;
 
 namespace ServerApp
@@ -63,14 +65,8 @@ namespace ServerApp
         /// </summary>
         public static void SessionProvider(IWorkflowContext<IWebServerContext> context)
         {
-
-            string url = context.Token.HttpContext.Request.RemoteEndPoint?.ToString();
-            bool valid = url != null && (url.StartsWith("192.168") || url.StartsWith("127.0.0.1") || url.StartsWith("[::1]"));
-
-            if (!valid)
-                throw new WorkflowAbortException($"Invalid endpoint: {url}");
+            Session s = context.Token.GetSession();
         }
-
 
         /// <summary>
         /// Produce a response.
