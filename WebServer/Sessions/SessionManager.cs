@@ -3,7 +3,7 @@ using System.Collections.Concurrent;
 
 namespace WebServer.Sessions
 {
-    public class SessionManager
+    internal class SessionManager
     {
         #region Private Members
 

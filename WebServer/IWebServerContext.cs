@@ -17,8 +17,6 @@ namespace WebServer
         /// </summary>
         HttpListenerContext HttpContext { get; }
 
-        SessionManager SessionManager { get; }
-
         /// <summary>
         /// 
         /// </summary>
