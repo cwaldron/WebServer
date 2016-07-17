@@ -11,6 +11,12 @@ namespace WebServer.Sessions
 
         #endregion
 
+        #region Constants
+
+        internal const string SessionCookieKey = "__SESSION_COOKIE__";
+
+        #endregion
+
         #region Constructors
 
         public SessionManager()
@@ -31,6 +37,17 @@ namespace WebServer.Sessions
                 return null;
             }
             return session;
+        }
+
+        /// <summary>
+        /// Gets the session based on the session id.
+        /// </summary>
+        /// <param name="sessionId"></param>
+        /// <returns>session</returns>
+        public Session GetSession(Guid sessionId)
+        {
+            Session session;
+            return (_sessions.TryGetValue(sessionId, out session)) ? session : null;
         }
 
         #endregion

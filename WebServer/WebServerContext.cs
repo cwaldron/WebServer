@@ -74,18 +74,8 @@ namespace WebServer
         /// <returns>session object</returns>
         public Session GetSession()
         {
-            var sessionCookie = HttpContext.Request.Cookies["__SESSION_COOKIE__"];
-            Session session;
-            if (sessionCookie == null)
-            {
-                session = SessionManager.CreateSession();
-            }
-            else
-            {
-               
-            }
-
-            return null;
+            var sessionCookie = HttpContext.Request.Cookies[SessionManager.SessionCookieKey];
+            return sessionCookie?.Value == null ? SessionManager.CreateSession() : SessionManager.GetSession(new Guid(sessionCookie.Value));
         }
 
         /// <summary> 

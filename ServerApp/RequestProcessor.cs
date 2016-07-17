@@ -18,6 +18,7 @@ namespace ServerApp
                 .Do(LogIpAddress)
                 .Do(AuthenticateContext)
                 .Do(WhiteList)
+                .Do(SessionProvider)
                 .Do(Response);
         }
 
@@ -66,6 +67,7 @@ namespace ServerApp
         public static void SessionProvider(IWorkflowContext<IWebServerContext> context)
         {
             Session s = context.Token.GetSession();
+            Console.WriteLine(s.Id);
         }
 
         /// <summary>
