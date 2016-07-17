@@ -104,6 +104,7 @@ namespace WebServer
             var symbol = new StringBuilder();
             var format = new StringBuilder();
             var symbolTable = new List<string>();
+            var tagTable = new HashSet<string>();
 
             while (index < source.Length)
             {
@@ -160,7 +161,8 @@ namespace WebServer
                         {
                             // Process symbol
                             symbolTable.Add(symbol.ToString());
-                            target.Append(GetPlaceholder(symbol.ToString(), symbolTable));
+                            tagTable.Add(symbol.ToString());
+                            target.Append(GetPlaceholder(symbol.ToString(), tagTable));
                             target.Append(source[index]);
                             state = 0;
                             index += 1;
@@ -171,6 +173,7 @@ namespace WebServer
                         {
                             // Start parse of format parameters
                             symbolTable.Add(symbol.ToString());
+                            tagTable.Add(symbol.ToString());
                             state = 3;
                             format = new StringBuilder();
                             index += 1;
@@ -183,7 +186,7 @@ namespace WebServer
                         if (source[index] == '}')
                         {
                             // Complete parse of format parameters
-                            target.AppendFormat("{0}:{1}", GetPlaceholder(symbolTable.Last(), symbolTable), format);
+                            target.AppendFormat("{0}:{1}", GetPlaceholder(symbolTable.Last(), tagTable), format);
                             target.Append(source[index]);
                             state = 0;
                             index += 1;
@@ -240,13 +243,12 @@ namespace WebServer
         /// Get the format placeholder id.
         /// </summary>
         /// <param name="symbol">symbol</param>
-        /// <param name="symbolTable">symbol table</param>
+        /// <param name="tagTable">symbol table</param>
         /// <returns>format placeholder id</returns>
-        private static int GetPlaceholder(string symbol, IEnumerable<string> symbolTable)
+        private static int GetPlaceholder(string symbol, ICollection<string> tagTable)
         {
-            var lookup = symbolTable.ToLookup(x => x).ToList();
-            int index = lookup.FindIndex(x => x.Key == symbol);
-            return index != -1 ? index : lookup.Count;
+            var index = tagTable.ToList().FindIndex(x => x == symbol);
+            return index != -1 ? index : tagTable.Count;
         }
 
         #endregion
