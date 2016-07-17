@@ -8,17 +8,22 @@ namespace WebServer
     public interface IWebServerContext
     {
         /// <summary>
-        /// 
+        /// Context id.
         /// </summary>
         Guid Id { get; }
 
         /// <summary>
-        /// 
+        /// Current http context.
         /// </summary>
         HttpListenerContext HttpContext { get; }
 
         /// <summary>
-        /// 
+        /// Current session object.
+        /// </summary>
+        Session Session { get; }
+
+        /// <summary>
+        /// Returns the endpoint address.
         /// </summary>
         /// <returns></returns>
         IPAddress GetEndpointAddress();
@@ -37,12 +42,6 @@ namespace WebServer
         /// Returns a dictionary of the parameters on the URL.
         /// </summary>
         IReadOnlyDictionary<string, string> GetQueryParameters();
-
-        /// <summary>
-        /// Returns the session object.
-        /// </summary>
-        /// <returns>session object</returns>
-        Session GetSession();
 
         /// <summary>
         /// 

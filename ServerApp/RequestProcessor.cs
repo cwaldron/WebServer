@@ -1,7 +1,5 @@
 ﻿using System;
-using System.Net;
 using WebServer;
-using WebServer.Sessions;
 using WebServer.Workflow;
 
 namespace ServerApp
@@ -66,8 +64,13 @@ namespace ServerApp
         /// </summary>
         public static void SessionProvider(IWorkflowContext<IWebServerContext> context)
         {
-            Session s = context.Token.GetSession();
+            dynamic s = context.Token.Session;
             Console.WriteLine(s.Id);
+            Console.WriteLine(s.EndPoint);
+            if (s.IsExpired)
+            {
+                throw new WorkflowException("Session has expired");
+            }
         }
 
         /// <summary>

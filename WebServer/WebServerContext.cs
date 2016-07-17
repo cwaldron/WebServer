@@ -14,6 +14,7 @@ namespace WebServer
         public Guid Id { get; }
         public HttpListenerContext HttpContext { get; }
         public SessionManager SessionManager { get; }
+        public Session Session { get; }
 
         #endregion
 
@@ -29,6 +30,7 @@ namespace WebServer
             Id = Guid.NewGuid();
             HttpContext = listener;
             SessionManager = sessionManager;
+            Session = GetSession();
         }
 
         #endregion
@@ -75,7 +77,9 @@ namespace WebServer
         public Session GetSession()
         {
             var sessionCookie = HttpContext.Request.Cookies[SessionManager.SessionCookieKey];
-            return sessionCookie?.Value == null ? SessionManager.CreateSession() : SessionManager.GetSession(new Guid(sessionCookie.Value));
+            dynamic session = sessionCookie?.Value == null ? SessionManager.CreateSession() : SessionManager.GetSession(new Guid(sessionCookie.Value));
+            session.EndPoint = HttpContext.Request.LocalEndPoint;
+            return session;
         }
 
         /// <summary> 
@@ -92,6 +96,9 @@ namespace WebServer
         /// <param name="responseText"></param>
         public void SendResponseText(string responseText)
         {
+            // Set the response cookie.
+            SetResponseCookie();
+
             // Setup response.
             var response = new WebResponse(responseText);
             HttpContext.Response.ContentType = response.ContentType;
@@ -102,6 +109,24 @@ namespace WebServer
 
             // Send the response.
             HttpContext.Response.OutputStream.Close();
+        }
+
+        #endregion
+
+        #region Helpers
+
+        private void SetResponseCookie()
+        {
+            // Set response cookie
+            var cookie = HttpContext.Response.Cookies[SessionManager.SessionCookieKey];
+            if (cookie != null)
+            {
+                cookie.Value = Session.Id.ToString();
+            }
+            else
+            {
+                HttpContext.Response.Cookies.Add(new Cookie(SessionManager.SessionCookieKey, Session.Id.ToString()));
+            }
         }
 
         #endregion
