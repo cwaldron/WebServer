@@ -11,7 +11,7 @@ namespace WebServer
     /// </summary>
     public static class StringExtensions
     {
-        #region Extension Methods
+        #region Render
 
         /// <summary>
         /// Renders the string using the placeholder for the property names.
@@ -27,8 +27,8 @@ namespace WebServer
         /// <summary>
         /// Renders the string using the placeholder for the property names.
         /// </summary>
-        /// <param name="format">The string to format.</param>
-        /// <param name="provider">The provider to use for formatting dates and numeric values.</param>
+        /// <param name="format">The format string.</param>
+        /// <param name="provider">The format provider used to format dates and numbers.</param>
         /// <param name="values">The object to pull the values from. Usually an anonymous type.</param>
         /// <returns>The rendered string.</returns>
         public static string Render(this string format, IFormatProvider provider, object values = null)
@@ -39,7 +39,7 @@ namespace WebServer
         /// <summary>
         /// Formats the string using the placeholder for the property names.
         /// </summary>
-        /// <param name="format">The string to format.</param>
+        /// <param name="format">The format string.</param>
         /// <param name="values">The dictionary to pull the values from.</param>
         /// <returns>The rendered string.</returns>
         public static string Render(this string format, IDictionary<string, object> values)
@@ -87,7 +87,7 @@ namespace WebServer
         /// |--------------------------------------------------------------------------|
         /// 
         /// A)	Lookahead.
-        ///     If character is '}' Then ++index, goto 0
+        ///      If character is '}' Then ++index, goto 0
         ///     Else goto E
         /// 
         /// B)	Symbol found.
@@ -103,7 +103,6 @@ namespace WebServer
             var target = new StringBuilder();
             var symbol = new StringBuilder();
             var format = new StringBuilder();
-            var placeholder = 0;
             var symbolTable = new List<string>();
 
             while (index < source.Length)
@@ -161,7 +160,7 @@ namespace WebServer
                         {
                             // Process symbol
                             symbolTable.Add(symbol.ToString());
-                            target.Append(placeholder++);
+                            target.Append(GetPlaceholder(symbol.ToString(), symbolTable));
                             target.Append(source[index]);
                             state = 0;
                             index += 1;
@@ -184,7 +183,7 @@ namespace WebServer
                         if (source[index] == '}')
                         {
                             // Complete parse of format parameters
-                            target.AppendFormat("{0}:{1}", placeholder++, format);
+                            target.AppendFormat("{0}:{1}", GetPlaceholder(symbolTable.Last(), symbolTable), format);
                             target.Append(source[index]);
                             state = 0;
                             index += 1;
@@ -235,6 +234,19 @@ namespace WebServer
             }
 
             return objectMap;
+        }
+
+        /// <summary>
+        /// Get the format placeholder id.
+        /// </summary>
+        /// <param name="symbol">symbol</param>
+        /// <param name="symbolTable">symbol table</param>
+        /// <returns>format placeholder id</returns>
+        private static int GetPlaceholder(string symbol, IEnumerable<string> symbolTable)
+        {
+            var lookup = symbolTable.ToLookup(x => x).ToList();
+            int index = lookup.FindIndex(x => x.Key == symbol);
+            return index != -1 ? index : lookup.Count;
         }
 
         #endregion
