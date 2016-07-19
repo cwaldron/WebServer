@@ -1,49 +1,102 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.ComponentModel;
+using System.Net.Http.Headers;
+using System.Runtime.CompilerServices;
 
 namespace WebServer
 {
     public static class Extensions
     {
-        /// <summary> 
-        /// Return everything to the left of the first occurrence of the specified string,
-        /// or the entire source string.
-        /// </summary> 
-        /// <param name="src">source string </param>
-        /// <param name="s">reference string</param>
-        /// <returns>
-        ///     New string left of the occurrence.
-        /// </returns>
-        public static string LeftOf(this string src, string s)
+        public static string ToUtcString(this DateTime dateTime)
         {
-            string ret = src;
-            int idx = src.IndexOf(s, StringComparison.Ordinal);
-            if (idx != -1)
-            {
-                ret = src.Substring(0, idx);
-            }
-
-            return ret;
+            return dateTime.ToUniversalTime().ToString("r");
         }
 
         /// <summary>
-        /// Return everything to the right of the first occurrence of the specified string,
-        /// or an empty string.
+        /// Add value to the dictionary.
         /// </summary>
-        /// <param name="src">source string </param>
-        /// <param name="s">reference string</param>
-        /// <returns>
-        ///     New string right of the occurrence.
-        /// </returns>
-        public static string RightOf(this string src, string s)
+        /// <typeparam name="TK">key type</typeparam>
+        /// <typeparam name="TV">value type</typeparam>
+        /// <param name="dictionary"></param>
+        /// <param name="key"></param>
+        /// <param name="value"></param>
+        /// <returns></returns>
+        public static bool TryAdd<TK, TV>(this Dictionary<TK, TV> dictionary, TK key, TV value)
         {
-            string ret = string.Empty;
-            int idx = src.IndexOf(s, StringComparison.Ordinal);
-            if (idx != -1)
+            try
             {
-                ret = src.Substring(idx + s.Length);
+                dictionary.Add(key, value);
+                return true;
+            }
+            catch (Exception)
+            {
+                return false;
+            }
+        }
+
+        /// <summary>
+        /// Dictionary.GetOrAdd
+        /// </summary>
+        /// <typeparam name="TK">key type</typeparam>
+        /// <typeparam name="TV">value type</typeparam>
+        /// <param name="dictionary">dictionary</param>
+        /// <param name="key">key value</param>
+        /// <param name="value">value</param>
+        /// <returns>value</returns>
+        public static TV GetOrAdd<TK, TV>(this Dictionary<TK, TV> dictionary, TK key, TV value)
+        {
+            if (!dictionary.ContainsKey(key))
+            {
+                dictionary.Add(key, value);
             }
 
-            return ret;
+            return dictionary[key];
+        }
+
+        /// <summary>
+        /// Adds a key/value pair to the dictionary.  
+        /// </summary>
+        /// <typeparam name="TK">key type</typeparam>
+        /// <typeparam name="TV">value type</typeparam>
+        /// <param name="dictionary">dictionary</param>
+        /// <param name="key">key value</param>
+        /// <param name="value">value</param>
+        /// <param name="updateFunc">update function</param>
+        /// <returns>The value for the key.</returns>
+        /// <remarks>
+        /// Add or updates the key/value pair to the dictionary.
+        /// </remarks>
+        public static TV AddOrUpdate<TK, TV>(this Dictionary<TK, TV> dictionary, TK key, TV value, Func<TK, TV, TV> updateFunc)
+        {
+            return updateFunc(key, dictionary.GetOrAdd(key, value));
+        }
+
+        /// <summary>
+        /// Adds a key/value pair to the dictionary.  
+        /// </summary>
+        /// <typeparam name="TK">key type</typeparam>
+        /// <typeparam name="TV">value type</typeparam>
+        /// <param name="dictionary"></param>
+        /// <param name="key"></param>
+        /// <param name="addFunc">add function</param>
+        /// <param name="updateFunc">update function</param>
+        /// <returns>The new value for the key.</returns>
+        /// <remarks>
+        /// Add or updates the key/value pair to the dictionary.
+        /// </remarks>
+        public static TV AddOrUpdate<TK, TV>(this Dictionary<TK, TV> dictionary, TK key, Func<TK, TV> addFunc, Func<TK, TV, TV> updateFunc)
+        {
+            if (!dictionary.ContainsKey(key))
+            {
+                dictionary.Add(key, addFunc(key));
+            }
+            else
+            {
+                dictionary[key] = updateFunc(key, dictionary[key]);
+            }
+
+            return dictionary[key];
         }
     }
 }

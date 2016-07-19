@@ -6,12 +6,10 @@ namespace ServerApp
 {
     public class RequestProcessor : IRequestProcessor<IWebServerContext>
     {
-        private WebContentLoader _loader;
         private readonly Workflow<IWebServerContext> _workflow;
 
         public RequestProcessor()
         {
-            _loader = new WebContentLoader();
             _workflow = new Workflow<IWebServerContext>()
                 .Do(LogIpAddress)
                 .Do(AuthenticateContext)
@@ -67,6 +65,7 @@ namespace ServerApp
             dynamic s = context.Token.Session;
             Console.WriteLine(s.Id);
             Console.WriteLine(s.EndPoint);
+
             if (s.IsExpired)
             {
                 throw new WorkflowException("Session has expired");

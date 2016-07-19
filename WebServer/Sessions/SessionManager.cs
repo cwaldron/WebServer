@@ -11,12 +11,6 @@ namespace WebServer.Sessions
 
         #endregion
 
-        #region Constants
-
-        internal const string SessionCookieKey = "__SESSION_COOKIE__";
-
-        #endregion
-
         #region Constructors
 
         public SessionManager()

@@ -4,17 +4,25 @@ using System.Net;
 using System.Linq;
 using WebServer.Sessions;
 using WebServer.Utilities;
+using Cookie = WebServer.Sessions.Cookie;
 
 namespace WebServer
 {
     internal class WebServerContext : IWebServerContext
     {
+        #region Private Variables
+
+        private readonly Dictionary<string, Cookie> _cookies;
+
+        #endregion
+
         #region Automatic Properties
 
         public Guid Id { get; }
         public HttpListenerContext HttpContext { get; }
         public SessionManager SessionManager { get; }
         public Session Session { get; }
+        public IReadOnlyDictionary<string, Cookie> Cookies => _cookies;
 
         #endregion
 
@@ -30,12 +38,45 @@ namespace WebServer
             Id = Guid.NewGuid();
             HttpContext = listener;
             SessionManager = sessionManager;
+            _cookies = PopulateCookies(listener);
             Session = GetSession();
         }
 
         #endregion
 
         #region Methods
+
+        /// <summary>
+        /// Adds a cookie to the context.
+        /// </summary>
+        /// <param name="name">cookie name</param>
+        /// <returns>existing cookie or adds new cookie.</returns>
+        public Cookie AddCookie(string name)
+        {
+            return _cookies.GetOrAdd(name, new Cookie(name));
+        }
+
+        /// <summary>
+        /// Gets a cookie from the context.
+        /// </summary>
+        /// <param name="name">cookie name</param>
+        /// <returns>cookie or null</returns>
+        public Cookie GetCookie(string name)
+        {
+            Cookie cookie;
+            _cookies.TryGetValue(name, out cookie);
+            return cookie;
+        }
+
+        /// <summary>
+        /// Sets a cookie.
+        /// </summary>
+        /// <param name="cookie">cookie</param>
+        public void SetCookie(Cookie cookie)
+        {
+            _cookies.AddOrUpdate(cookie.Name, cookie, (k, v) => cookie);
+        }
+
 
         /// <summary>
         /// Return the remote endpoint IP address. 
@@ -76,7 +117,7 @@ namespace WebServer
         /// <returns>session object</returns>
         public Session GetSession()
         {
-            var sessionCookie = HttpContext.Request.Cookies[SessionManager.SessionCookieKey];
+            var sessionCookie = HttpContext.Request.Cookies[Session.CookieName];
             dynamic session = sessionCookie?.Value == null ? SessionManager.CreateSession() : SessionManager.GetSession(new Guid(sessionCookie.Value));
             session.EndPoint = HttpContext.Request.LocalEndPoint;
             return session;
@@ -118,15 +159,20 @@ namespace WebServer
         private void SetResponseCookie()
         {
             // Set response cookie
-            var cookie = HttpContext.Response.Cookies[SessionManager.SessionCookieKey];
+            var cookie = HttpContext.Response.Cookies[Session.CookieName];
             if (cookie != null)
             {
                 cookie.Value = Session.Id.ToString();
             }
             else
             {
-                HttpContext.Response.Cookies.Add(new Cookie(SessionManager.SessionCookieKey, Session.Id.ToString()));
+                HttpContext.Response.Cookies.Add(new System.Net.Cookie(Session.CookieName, Session.Id.ToString()));
             }
+        }
+
+        private static Dictionary<string, Cookie> PopulateCookies(HttpListenerContext listener)
+        {
+            return listener.Request.Cookies.OfType<System.Net.Cookie>().Select(x => new Cookie(x)).ToDictionary(x => x.Name);
         }
 
         #endregion
