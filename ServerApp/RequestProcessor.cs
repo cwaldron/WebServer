@@ -62,11 +62,11 @@ namespace ServerApp
         /// </summary>
         public static void SessionProvider(IWorkflowContext<IWebServerContext> context)
         {
-            dynamic s = context.Token.Session;
+            var s = context.Token.Session;
             Console.WriteLine(s.Id);
-            Console.WriteLine(s.EndPoint);
+            //Console.WriteLine(s.EndPoint);
 
-            if (s.IsExpired)
+            if (s.Expired)
             {
                 throw new WorkflowException("Session has expired");
             }

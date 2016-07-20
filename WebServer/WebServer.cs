@@ -4,7 +4,6 @@ using System.Diagnostics;
 using System.Net;
 using System.Threading.Tasks;
 using WebServer.Queueing;
-using WebServer.Sessions;
 using WebServer.Workflow;
 
 namespace WebServer
@@ -15,7 +14,6 @@ namespace WebServer
 
         private readonly HttpListener _listener;
         private readonly RequestManager<IWebServerContext> _requestManager;
-        private readonly SessionManager _sessionManager;
         private Workflow<IWebServerContext> _workflow; 
         private bool _disposed;
 
@@ -49,9 +47,6 @@ namespace WebServer
             {
                 throw new ArgumentException("prefixes");
             }
-
-            // Setup session manager.
-            _sessionManager = new SessionManager();
 
             // Setup abort and exception handlers.
             var processor = requestProcessor ?? this;
@@ -107,7 +102,7 @@ namespace WebServer
                 {
                     try
                     {
-                        _requestManager.Process(new WebServerContext(_listener.GetContext(), _sessionManager));
+                        _requestManager.Process(new WebServerContext(_listener.GetContext()));
                     }
                     catch (HttpListenerException)
                     {

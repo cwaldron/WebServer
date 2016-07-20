@@ -4,6 +4,7 @@ using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Dynamic;
 using System.Linq;
+using System.Runtime.InteropServices.WindowsRuntime;
 using System.Text;
 
 namespace WebServer.Sessions
@@ -113,7 +114,7 @@ namespace WebServer.Sessions
         {
             get
             {
-                return ToString();
+                return ValueToString();
             }
             set
             {
@@ -146,6 +147,35 @@ namespace WebServer.Sessions
         #endregion
 
         #region Methods
+
+        /// <summary>
+        /// Object collection getter with type conversion.
+        /// Note that if the object does not exist in the session, the default
+        /// value is returned.
+        /// Therefore, session objects like "isAdmin" or "isAuthenticated"
+        /// should always be true for their "yes" state. 
+        /// </summary>
+        public T Get<T>(string key)
+        {
+            try
+            {
+               return (T) this[key];
+            }
+            catch (Exception)
+            {
+                return default(T);
+            }
+       }
+
+        public IEnumerator<KeyValuePair<string, object>> GetEnumerator()
+        {
+            return _properties.GetEnumerator();
+        }
+
+        IEnumerator IEnumerable.GetEnumerator()
+        {
+            return GetEnumerator();
+        }
 
         /// <summary>
         /// Gets the set-cookie response header.
@@ -197,33 +227,22 @@ namespace WebServer.Sessions
             return sb.ToString();
         }
 
-        /// <summary>
-        /// Object collection getter with type conversion.
-        /// Note that if the object does not exist in the session, the default
-        /// value is returned.
-        /// Therefore, session objects like "isAdmin" or "isAuthenticated"
-        /// should always be true for their "yes" state. 
-        /// </summary>
-        public T Get<T>(string key)
+        internal System.Net.Cookie GetResponseCookie()
         {
-            try
+            return new System.Net.Cookie
             {
-                return (T) this[key];
-            }
-            catch (Exception)
-            {
-                return default(T);
-            }
-       }
-
-        public IEnumerator<KeyValuePair<string, object>> GetEnumerator()
-        {
-            return _properties.GetEnumerator();
-        }
-
-        IEnumerator IEnumerable.GetEnumerator()
-        {
-            return GetEnumerator();
+                Comment = Comment,
+                Discard = Discard,
+                Domain = Domain,
+                Expired = Expired,
+                Expires = Expires.GetValueOrDefault(),
+                HttpOnly = HttpOnly,
+                Name = Name,
+                Path = Path,
+                Secure = Secure,
+                Value = Value,
+                Version = Version
+            };
         }
 
         #endregion
@@ -256,17 +275,10 @@ namespace WebServer.Sessions
         public override string ToString()
         {
             var sb = new StringBuilder();
-            foreach (var pair in _properties)
-            {
-                sb.Append($"{pair.Key}={pair.Value}{KeyValueSeparatorChar}");
-            }
-
-            if (sb.Length > 0)
-            {
-                sb.Remove(sb.Length - 1, 1);
-            }
-
-            return base.ToString();
+            sb.Append(Name);
+            sb.Append('=');
+            sb.Append(Value);
+            return sb.ToString();
         }
 
         #endregion
@@ -303,6 +315,28 @@ namespace WebServer.Sessions
             }
 
             return maxAge;
+        }
+
+
+        private string ValueToString()
+        {
+            var sb = new StringBuilder();
+
+            foreach (var pair in _properties)
+            {
+                sb.Append(string.IsNullOrEmpty(pair.Key)
+                    ? string.Empty
+                    : $"{pair.Key}=");
+
+                sb.Append($"{pair.Value}{KeyValueSeparatorChar}");
+            }
+
+            if (sb.Length > 0)
+            {
+                sb.Remove(sb.Length - 1, 1);
+            }
+
+            return sb.ToString();
         }
 
         #endregion

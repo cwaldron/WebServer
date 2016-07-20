@@ -21,6 +21,11 @@ namespace WebServer.Sessions
             Id = Guid.NewGuid();
         }
 
+        internal Session(System.Net.Cookie cookie)
+            : base(cookie)
+        {
+        }
+
         #endregion
 
         #region Properties
@@ -30,7 +35,7 @@ namespace WebServer.Sessions
         /// </summary>
         public Guid Id
         {
-            get { return Get<Guid>(IdToken); }
+            get { return new Guid(this[IdToken].ToString()); }
             private set { this[IdToken] = value; }
         }
 
@@ -53,6 +58,20 @@ namespace WebServer.Sessions
             set { this[IsAuthorizedToken] = value; }
         }
 
+
+        #endregion
+
+        #region Methods
+
+        internal static Session NewSession(System.Net.Cookie cookie)
+        {
+            if (cookie == null) return new Session();
+
+            if (cookie.Name != CookieName)
+                throw new ArgumentException($"{cookie.Name} is not a session cookie");
+
+            return new Session(cookie);
+        }
 
         #endregion
     }

@@ -20,7 +20,6 @@ namespace WebServer
 
         public Guid Id { get; }
         public HttpListenerContext HttpContext { get; }
-        public SessionManager SessionManager { get; }
         public Session Session { get; }
         public IReadOnlyDictionary<string, Cookie> Cookies => _cookies;
 
@@ -32,12 +31,10 @@ namespace WebServer
         /// WebServerContext constructor.
         /// </summary>
         /// <param name="listener">http listner</param>
-        /// <param name="sessionManager">session manager</param>
-        internal WebServerContext(HttpListenerContext listener, SessionManager sessionManager)
+        internal WebServerContext(HttpListenerContext listener)
         {
             Id = Guid.NewGuid();
             HttpContext = listener;
-            SessionManager = sessionManager;
             _cookies = PopulateCookies(listener);
             Session = GetSession();
         }
@@ -117,9 +114,9 @@ namespace WebServer
         /// <returns>session object</returns>
         public Session GetSession()
         {
-            var sessionCookie = HttpContext.Request.Cookies[Session.CookieName];
-            dynamic session = sessionCookie?.Value == null ? SessionManager.CreateSession() : SessionManager.GetSession(new Guid(sessionCookie.Value));
-            session.EndPoint = HttpContext.Request.LocalEndPoint;
+            var cookie = HttpContext.Request.Cookies[Session.CookieName];
+            var session = Session.NewSession(cookie);
+            _cookies.TryAdd(session.Name, session);
             return session;
         }
 
@@ -137,8 +134,8 @@ namespace WebServer
         /// <param name="responseText"></param>
         public void SendResponseText(string responseText)
         {
-            // Set the response cookie.
-            SetResponseCookie();
+            // Set the response cookies.
+            SetResponseCookies();
 
             // Setup response.
             var response = new WebResponse(responseText);
@@ -156,17 +153,12 @@ namespace WebServer
 
         #region Helpers
 
-        private void SetResponseCookie()
+        private void SetResponseCookies()
         {
             // Set response cookie
-            var cookie = HttpContext.Response.Cookies[Session.CookieName];
-            if (cookie != null)
+            foreach (var cookie in Cookies.Values)
             {
-                cookie.Value = Session.Id.ToString();
-            }
-            else
-            {
-                HttpContext.Response.Cookies.Add(new System.Net.Cookie(Session.CookieName, Session.Id.ToString()));
+                HttpContext.Response.Cookies.Add(cookie.GetResponseCookie());
             }
         }
 
