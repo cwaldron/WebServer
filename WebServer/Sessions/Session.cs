@@ -35,7 +35,14 @@ namespace WebServer.Sessions
         /// </summary>
         public Guid Id
         {
-            get { return new Guid(this[IdToken].ToString()); }
+            get
+            {
+                if (this[IdToken] is string)
+                {
+                    this[IdToken] = new Guid(this[IdToken].ToString());
+                }
+                return (Guid)this[IdToken];
+            }
             private set { this[IdToken] = value; }
         }
 
