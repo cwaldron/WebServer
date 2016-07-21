@@ -113,33 +113,11 @@ namespace WebServer.Sessions
         {
             get
             {
-                return ValueToString();
+                return SerializeValue();
             }
             set
             {
-                _properties.Clear();
-
-                // Check value.
-                if (string.IsNullOrEmpty(value)) return;
-
-                // Convert value string to key-value collection.
-                string[] pairs = value.Split(KeyValueSeparatorChar);
-                foreach (var keyvalue in pairs.Select(pair => pair.Split('=')))
-                {
-                    switch (keyvalue.Length)
-                    {
-                        case 1:
-                            _properties.AddOrUpdate(string.Empty, keyvalue[0], (k, v) => keyvalue[0]);
-                            break;
-
-                        case 2:
-                            _properties.AddOrUpdate(keyvalue[0], keyvalue[1], (k, v) => keyvalue[1]);
-                            break;
-
-                        default:
-                            throw new FormatException();
-                    }
-                }
+                DeserializeValue(value);
             }
         }
 
@@ -158,7 +136,11 @@ namespace WebServer.Sessions
         {
             try
             {
-               return (T) this[key];
+                if (typeof(T) != typeof(string) && this[key] is string)
+                {
+                    this[key] = Converter.Deserialize<T>(this[key].ToString());
+                }
+                return (T) this[key];
             }
             catch (Exception)
             {
@@ -316,8 +298,43 @@ namespace WebServer.Sessions
             return maxAge;
         }
 
+        /// <summary>
+        /// Deserialize cookie value
+        /// </summary>
+        /// <param name="value">cookie value</param>
+        private void DeserializeValue(string value)
+        {
+            // Clear the properties.
+            _properties.Clear();
 
-        private string ValueToString()
+            // Check value.
+            if (string.IsNullOrEmpty(value)) return;
+
+            // Convert value string to key-value collection.
+            string[] pairs = value.Split(KeyValueSeparatorChar);
+            foreach (var keyvalue in pairs.Select(pair => pair.Split('=')))
+            {
+                switch (keyvalue.Length)
+                {
+                    case 1:
+                        _properties.AddOrUpdate(string.Empty, keyvalue[0], (k, v) => keyvalue[0]);
+                        break;
+
+                    case 2:
+                        _properties.AddOrUpdate(keyvalue[0], keyvalue[1], (k, v) => keyvalue[1]);
+                        break;
+
+                    default:
+                        throw new FormatException();
+                }
+            }
+        }
+
+        /// <summary>
+        /// Serialize cookie value
+        /// </summary>
+        /// <returns>serialized cookie</returns>
+        private string SerializeValue()
         {
             var sb = new StringBuilder();
 
