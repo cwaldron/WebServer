@@ -1,21 +1,13 @@
 ﻿using System;
-using System.Collections;
-using System.Collections.Concurrent;
 using System.Collections.Generic;
-using System.Dynamic;
 using System.Linq;
 using System.Text;
+using WebServer.Utilities;
 
 namespace WebServer.Sessions
 {
-    public class Cookie : DynamicObject, IEnumerable<KeyValuePair<string, object>>
+    public class Cookie : DynamicDictionary
     {
-        #region Private Variables
-
-        private readonly ConcurrentDictionary<string, object> _properties;
-
-        #endregion
-
         #region Constants
 
         private const string DomainToken = "domain";
@@ -44,14 +36,9 @@ namespace WebServer.Sessions
         public bool HttpOnly { get; set; }
 
         /// <summary>
-        /// Determines whether there are any session objects.
-        /// </summary>
-        public bool IsEmpty => _properties.IsEmpty;
-
-        /// <summary>
         /// Get the session object keys.
         /// </summary>
-        public IReadOnlyCollection<string> Keys => (IReadOnlyCollection<string>)_properties.Keys;
+        public new IReadOnlyCollection<string> Keys => Keys;
 
         public string Name { get; }
 
@@ -71,7 +58,6 @@ namespace WebServer.Sessions
 
         internal Cookie(string name)
         {
-            _properties = new ConcurrentDictionary<string, object>();
             Name = name;
             Comment = string.Empty;
             Path = DefaultPath;
@@ -113,33 +99,11 @@ namespace WebServer.Sessions
         {
             get
             {
-                return ValueToString();
+                return SerializeValue();
             }
             set
             {
-                _properties.Clear();
-
-                // Check value.
-                if (string.IsNullOrEmpty(value)) return;
-
-                // Convert value string to key-value collection.
-                string[] pairs = value.Split(KeyValueSeparatorChar);
-                foreach (var keyvalue in pairs.Select(pair => pair.Split('=')))
-                {
-                    switch (keyvalue.Length)
-                    {
-                        case 1:
-                            _properties.AddOrUpdate(string.Empty, keyvalue[0], (k, v) => keyvalue[0]);
-                            break;
-
-                        case 2:
-                            _properties.AddOrUpdate(keyvalue[0], keyvalue[1], (k, v) => keyvalue[1]);
-                            break;
-
-                        default:
-                            throw new FormatException();
-                    }
-                }
+                DeserializeValue(value);
             }
         }
 
@@ -158,22 +122,16 @@ namespace WebServer.Sessions
         {
             try
             {
-               return (T) this[key];
+                if (typeof(T) != typeof(string) && this[key] is string)
+                {
+                    this[key] = Converter.Deserialize<T>(this[key].ToString());
+                }
+                return (T) this[key];
             }
             catch (Exception)
             {
                 return default(T);
             }
-       }
-
-        public IEnumerator<KeyValuePair<string, object>> GetEnumerator()
-        {
-            return _properties.GetEnumerator();
-        }
-
-        IEnumerator IEnumerable.GetEnumerator()
-        {
-            return GetEnumerator();
         }
 
         /// <summary>
@@ -248,29 +206,6 @@ namespace WebServer.Sessions
 
         #region Overrides
 
-        /// <summary>
-        /// Gets a member from the dynamic object
-        /// </summary>
-        /// <param name="binder">dynamic member binder</param>
-        /// <param name="result">return result</param>
-        /// <returns> true if successful otherwise false is returned.</returns>
-        public override bool TryGetMember(GetMemberBinder binder, out object result)
-        {
-            return _properties.TryGetValue(binder.Name, out result);
-        }
-
-        /// <summary>
-        /// Sets a member of the dynamic object
-        /// </summary>
-        /// <param name="binder">dynamic member binder</param>
-        /// <param name="value">value to set</param>
-        /// <returns> true if successful otherwise false is returned.</returns>
-        public override bool TrySetMember(SetMemberBinder binder, object value)
-        {
-            _properties[binder.Name] = value;
-            return true;
-        }
-
         public override string ToString()
         {
             var sb = new StringBuilder();
@@ -286,18 +221,18 @@ namespace WebServer.Sessions
 
         // Indexer for accessing session objects. If an object isn't found,
         // null is returned. 
-        public object this[string key]
+        public override object this[string key]
         {
             get
             {
                 object val;
-                _properties.TryGetValue(key, out val);
+                TryGetValue(key, out val);
                 return val;
             }
 
             set
             {
-                _properties[key] = value;
+                base[key] = value;
             }
         }
 
@@ -316,12 +251,47 @@ namespace WebServer.Sessions
             return maxAge;
         }
 
+        /// <summary>
+        /// Deserialize cookie value
+        /// </summary>
+        /// <param name="value">cookie value</param>
+        private void DeserializeValue(string value)
+        {
+            // Clear the properties.
+            Clear();
 
-        private string ValueToString()
+            // Check value.
+            if (string.IsNullOrEmpty(value)) return;
+
+            // Convert value string to key-value collection.
+            string[] pairs = value.Split(KeyValueSeparatorChar);
+            foreach (var keyvalue in pairs.Select(pair => pair.Split('=')))
+            {
+                switch (keyvalue.Length)
+                {
+                    case 1:
+                        this.AddOrUpdate(string.Empty, keyvalue[0], (k, v) => keyvalue[0]);
+                        break;
+
+                    case 2:
+                        this.AddOrUpdate(keyvalue[0], keyvalue[1], (k, v) => keyvalue[1]);
+                        break;
+
+                    default:
+                        throw new FormatException();
+                }
+            }
+        }
+
+        /// <summary>
+        /// Serialize cookie value
+        /// </summary>
+        /// <returns>serialized cookie</returns>
+        private string SerializeValue()
         {
             var sb = new StringBuilder();
 
-            foreach (var pair in _properties)
+            foreach (var pair in this)
             {
                 sb.Append(string.IsNullOrEmpty(pair.Key)
                     ? string.Empty

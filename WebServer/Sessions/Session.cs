@@ -35,17 +35,9 @@ namespace WebServer.Sessions
         /// </summary>
         public Guid Id
         {
-            get
-            {
-                if (this[IdToken] is string)
-                {
-                    this[IdToken] = new Guid(this[IdToken].ToString());
-                }
-                return (Guid)this[IdToken];
-            }
+            get { return Get<Guid>(IdToken); }
             private set { this[IdToken] = value; }
         }
-
 
         /// <summary>
         /// Last time the session was connected.
@@ -64,7 +56,6 @@ namespace WebServer.Sessions
             get { return Get<bool>(IsAuthorizedToken); }
             set { this[IsAuthorizedToken] = value; }
         }
-
 
         #endregion
 

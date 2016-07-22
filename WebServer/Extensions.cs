@@ -19,7 +19,7 @@ namespace WebServer
         /// <param name="key"></param>
         /// <param name="value"></param>
         /// <returns></returns>
-        public static bool TryAdd<TK, TV>(this Dictionary<TK, TV> dictionary, TK key, TV value)
+        public static bool TryAdd<TK, TV>(this IDictionary<TK, TV> dictionary, TK key, TV value)
         {
             try
             {
@@ -41,7 +41,7 @@ namespace WebServer
         /// <param name="key">key value</param>
         /// <param name="value">value</param>
         /// <returns>value</returns>
-        public static TV GetOrAdd<TK, TV>(this Dictionary<TK, TV> dictionary, TK key, TV value)
+        public static TV GetOrAdd<TK, TV>(this IDictionary<TK, TV> dictionary, TK key, TV value)
         {
             if (!dictionary.ContainsKey(key))
             {
@@ -64,7 +64,7 @@ namespace WebServer
         /// <remarks>
         /// Add or updates the key/value pair to the dictionary.
         /// </remarks>
-        public static TV AddOrUpdate<TK, TV>(this Dictionary<TK, TV> dictionary, TK key, TV value, Func<TK, TV, TV> updateFunc)
+        public static TV AddOrUpdate<TK, TV>(this IDictionary<TK, TV> dictionary, TK key, TV value, Func<TK, TV, TV> updateFunc)
         {
             return updateFunc(key, dictionary.GetOrAdd(key, value));
         }
@@ -82,7 +82,7 @@ namespace WebServer
         /// <remarks>
         /// Add or updates the key/value pair to the dictionary.
         /// </remarks>
-        public static TV AddOrUpdate<TK, TV>(this Dictionary<TK, TV> dictionary, TK key, Func<TK, TV> addFunc, Func<TK, TV, TV> updateFunc)
+        public static TV AddOrUpdate<TK, TV>(this IDictionary<TK, TV> dictionary, TK key, Func<TK, TV> addFunc, Func<TK, TV, TV> updateFunc)
         {
             if (!dictionary.ContainsKey(key))
             {

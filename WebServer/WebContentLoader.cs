@@ -11,7 +11,7 @@ namespace WebServer
     {
         #region Private Members
 
-        private Dictionary<string, Tuple<string, IContentLoader>> _contentLoaders;
+        private readonly Dictionary<string, Tuple<string, IContentLoader>> _contentLoaders;
 
         #endregion
 

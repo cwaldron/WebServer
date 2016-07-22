@@ -9,7 +9,7 @@ namespace ServerApp
             using (var ws = new WebServer.WebServer(new RequestProcessor(), "http://localhost:80/"))
             {
                 ws.Run();
-                Console.WriteLine("Press any key to exit the server");
+                Console.WriteLine(@"Press any key to exit the server");
                 Console.ReadKey();
             }
         }
