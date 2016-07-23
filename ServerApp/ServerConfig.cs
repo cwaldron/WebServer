@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Linq;
+using System.Reflection;
 using WebServer;
 
 namespace ServerApp
@@ -20,13 +21,13 @@ namespace ServerApp
 
             var modules = (from assembly in AppDomain.CurrentDomain.GetAssemblies()
                            from type in assembly.GetTypes()
-                           where typeof(Module).IsAssignableFrom(type) && type != typeof(Module)
+                           where typeof(WebServerModule).IsAssignableFrom(type) && type != typeof(WebServerModule)
                            select new { Type = type }).ToList();
 
             foreach (var module in modules)
             {
-                var instance = (Module)Activator.CreateInstance(module.Type);
-                instance.Initialise();
+                var instance = (WebServerModule)Activator.CreateInstance(module.Type);
+                instance.Initialize();
             }
 
             //return engine;

@@ -1,9 +1,10 @@
 ﻿using System;
+using System.Reflection;
 using WebServer;
 
 namespace ServerApp
 {
-    public class ServerModule : Module
+    public class ServerModule : WebServerModule
     {
         public ServerModule()
         {

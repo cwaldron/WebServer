@@ -15,6 +15,7 @@ namespace ServerApp
                 .Do(AuthenticateContext)
                 .Do(WhiteList)
                 .Do(SessionProvider)
+                .Do(RouteProvider)
                 .Do(Response);
         }
 
@@ -70,6 +71,14 @@ namespace ServerApp
             {
                 throw new WorkflowException("Session has expired");
             }
+        }
+
+        /// <summary>
+        /// Only intranet IP addresses are allowed.
+        /// </summary>
+        public static void RouteProvider(IWorkflowContext<IWebServerContext> context)
+        {
+            Console.WriteLine(@"In route provider");
         }
 
         /// <summary>

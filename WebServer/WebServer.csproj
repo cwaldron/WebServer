@@ -43,6 +43,8 @@
     <Compile Include="Content\FileLoader.cs" />
     <Compile Include="Content\PageLoader.cs" />
     <Compile Include="Content\ImageLoader.cs" />
+    <Compile Include="Routing\RouteVerb.cs" />
+    <Compile Include="WebServerModule.cs" />
     <Compile Include="Routing\RouteParser.cs" />
     <Compile Include="Routing\RouteData.cs" />
     <Compile Include="Routing\ConstantNode.cs" />

@@ -2,24 +2,18 @@
 
 namespace WebServer
 {
-    public class Module : Module<RouteData>
+    public abstract class Module<T> where T : RouteData
     {
-    }
-
-    public class Module<T> where T : RouteData
-    {
-        public Module()
+        protected Module()
         {
-            Get = new MethodSet<T>("GET");
-            Put = new MethodSet<T>("PUT");
-            Post = new MethodSet<T>("POST");
-            Patch = new MethodSet<T>("PATCH");
-            Delete = new MethodSet<T>("DELETE");
-            Expiry = new MethodSet<T>("EXPIRY");
-            Authorize = new MethodSet<T>("AUTH");
+            Get = new MethodSet<T>(RouteVerb.Get.ToString().ToUpperInvariant());
+            Put = new MethodSet<T>(RouteVerb.Put.ToString().ToUpperInvariant());
+            Post = new MethodSet<T>(RouteVerb.Post.ToString().ToUpperInvariant());
+            Patch = new MethodSet<T>(RouteVerb.Patch.ToString().ToUpperInvariant());
+            Delete = new MethodSet<T>(RouteVerb.Delete.ToString().ToUpperInvariant());
         }
 
-        public void Initialise()
+        public void Initialize()
         {
             Get.Initialize();
             Put.Initialize();
@@ -37,10 +31,5 @@ namespace WebServer
         public MethodSet<T> Patch { get; }
 
         public MethodSet<T> Delete { get; }
-
-        public MethodSet<T> Expiry { get; }
-
-        public MethodSet<T> Authorize { get; }
-
     }
 }
