@@ -1,4 +1,5 @@
 ﻿using System;
+using ServerHost;
 
 namespace ServerApp
 {
@@ -6,9 +7,9 @@ namespace ServerApp
     {
         static void Main(string[] args)
         {
-            using (var ws = new WebServer.WebServer(new RequestProcessor(), "http://localhost:80/"))
+            using (var host = new WebHost("http://localhost:80/"))
             {
-                ws.Run();
+                host.Start();
                 Console.WriteLine(@"Press any key to exit the server");
                 Console.ReadKey();
             }

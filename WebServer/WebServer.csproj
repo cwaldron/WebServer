@@ -40,6 +40,9 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Application\ApplicationLocator.cs" />
+    <Compile Include="Application\ApplicationHost.cs" />
+    <Compile Include="Application\Application.cs" />
     <Compile Include="Content\FileLoader.cs" />
     <Compile Include="Content\PageLoader.cs" />
     <Compile Include="Content\ImageLoader.cs" />

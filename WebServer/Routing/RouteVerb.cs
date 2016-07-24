@@ -1,15 +1,13 @@
-﻿using System;
-using System.Collections.Generic;
-using WebServer.Utilities;
-
-namespace WebServer.Routing
+﻿namespace WebServer.Routing
 {
     public enum RouteVerb
     {
+        Delete,
         Get,
+        Head,
+        Options,
         Post,
         Put,
-        Patch,
-        Delete,
+        Patch
     }
 }

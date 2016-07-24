@@ -2,7 +2,7 @@
 using WebServer;
 using WebServer.Workflow;
 
-namespace ServerApp
+namespace ServerHost
 {
     public class RequestProcessor : IRequestProcessor<IWebServerContext>
     {
