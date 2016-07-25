@@ -1,3 +1,6 @@
 ServerApp/bin/
 ServerApp/obj/
 WebServer/obj/
+ServerMain/obj/
+ServerMain/bin/
+ServerHost/obj/
