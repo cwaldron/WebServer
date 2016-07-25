@@ -1,16 +1,32 @@
 ﻿using System;
 using WebServer;
+using WebServer.Application;
 using WebServer.Workflow;
 
 namespace ServerHost
 {
     public class RequestProcessor : IRequestProcessor<IWebServerContext>
     {
-        private readonly Workflow<IWebServerContext> _workflow;
+        #region Private Members
 
-        public RequestProcessor()
+        private bool _disposed;
+
+        #endregion
+
+        #region Automatic Properties
+
+        public IApplication Application { get; }
+
+        public Workflow<IWebServerContext> Workflow { get; }
+
+        #endregion
+
+        #region Constructors
+
+        public RequestProcessor(IApplication application)
         {
-            _workflow = new Workflow<IWebServerContext>()
+            Application = application ?? ApplicationLocator.FindApplication();
+            Workflow = new Workflow<IWebServerContext>()
                 .Do(LogIpAddress)
                 .Do(AuthenticateContext)
                 .Do(WhiteList)
@@ -19,14 +35,9 @@ namespace ServerHost
                 .Do(Response);
         }
 
-        /// <summary>
-        /// Gets the request process workflow.
-        /// </summary>
-        /// <returns>workflow</returns>
-        public Workflow<IWebServerContext> GetWorkflow()
-        {
-            return _workflow;
-        }
+        #endregion
+
+        #region Methods
 
         /// <summary>
         /// A workflow item, implementing a simple instrumentation of the client IP address, port, and URL.
@@ -92,5 +103,31 @@ namespace ServerHost
             Console.WriteLine($"Request Verb = '{context.Token.GetRequestVerb()}'");
             context.Token.SendResponseText($"<HTML><BODY>My web page.<br>{DateTime.Now}</BODY></HTML>");
         }
+
+        #endregion
+
+        #region IDisposable Members
+
+        /// <summary>
+        /// Disposes the concurrent queue.
+        /// </summary>
+        public void Dispose()
+        {
+            Dispose(!_disposed);
+            _disposed = true;
+            GC.SuppressFinalize(this);
+        }
+
+        /// <summary>
+        /// Dispose concurrent queue.
+        /// </summary>
+        /// <param name="disposing">indicate whether the queue is disposing</param>
+        protected virtual void Dispose(bool disposing)
+        {
+            if (!disposing) return;
+            Application.Dispose();
+        }
+
+        #endregion
     }
 }

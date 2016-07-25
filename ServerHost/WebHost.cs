@@ -1,4 +1,5 @@
 ﻿using System;
+using WebServer.Application;
 
 namespace ServerHost
 {
@@ -7,13 +8,29 @@ namespace ServerHost
     /// </summary>
     public class WebHost : IDisposable
     {
+        #region Private Variables
+
         private readonly WebServer.WebServer _server;
         private bool _disposed;
 
+        #endregion
+
+        #region Constructors
+
         public WebHost(params string[] urls)
         {
-            _server = new WebServer.WebServer(new RequestProcessor(), urls);
+            _server = new WebServer.WebServer(new RequestProcessor(ApplicationLocator.FindApplication()), urls);
         }
+
+        public WebHost(IApplication app, params string[] urls)
+        {
+            if (app == null) throw new ArgumentNullException(nameof(app));
+            _server = new WebServer.WebServer(new RequestProcessor(app), urls);
+        }
+
+        #endregion
+
+        #region Methods
 
         public void Start()
         {
@@ -24,6 +41,8 @@ namespace ServerHost
         {
             _server.Stop();
         }
+
+        #endregion
 
         #region IDisposable Members
 

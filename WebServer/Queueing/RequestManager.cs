@@ -1,6 +1,4 @@
 ﻿using System;
-using System.Net;
-using System.Text;
 using System.Threading.Tasks;
 using WebServer.Workflow;
 
@@ -51,8 +49,7 @@ namespace WebServer.Queueing
                     if (!context.Equals(default(T)))
                     {
                         // Execute context through the workflow.
-                        var workflow = _requestProcessor.GetWorkflow();
-                        workflow.Run(context);
+                        _requestProcessor.Workflow.Run(context);
                     }
                 }
             });

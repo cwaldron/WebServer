@@ -1,10 +1,15 @@
 ﻿using System.Net;
+using WebServer.Application;
 using WebServer.Workflow;
+
+using System;
 
 namespace WebServer
 {
-    public interface IRequestProcessor<T>
+    public interface IRequestProcessor<T> : IDisposable
     {
-        Workflow<T> GetWorkflow();
+        IApplication Application { get; }
+
+        Workflow<T> Workflow { get; }
     }
 }

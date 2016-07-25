@@ -3,28 +3,40 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Net;
 using System.Threading.Tasks;
+using WebServer.Application;
 using WebServer.Queueing;
 using WebServer.Workflow;
 
 namespace WebServer
 {
-    public class WebServer : IRequestProcessor<IWebServerContext>, IDisposable
+    public class WebServer : IRequestProcessor<IWebServerContext>
     {
         #region Private Members
 
         private readonly HttpListener _listener;
         private readonly RequestManager<IWebServerContext> _requestManager;
+        private IApplication _application;
         private Workflow<IWebServerContext> _workflow; 
         private bool _disposed;
 
         #endregion
 
-        #region Properties
+        #region Automatic Properties
+
+        /// <summary>
+        /// Gets the web application.
+        /// </summary>
+        public IApplication Application => _application ?? (_application = ApplicationLocator.FindApplication());
 
         /// <summary>
         /// Determines if the webserver is listening for requests.
         /// </summary>
         public bool IsListening => _listener.IsListening;
+
+        /// <summary>
+        /// Gets the request process workflow.
+        /// </summary>
+        public Workflow<IWebServerContext> Workflow => _workflow ?? (_workflow = new Workflow<IWebServerContext>());
 
         #endregion
 
@@ -50,15 +62,14 @@ namespace WebServer
 
             // Setup abort and exception handlers.
             var processor = requestProcessor ?? this;
-            var workflow = processor.GetWorkflow();
-            if (!workflow.HasAbortHandler)
+            if (!processor.Workflow.HasAbortHandler)
             {
-                workflow.OnAbort(AbortHandler);
+                processor.Workflow.OnAbort(AbortHandler);
             }
 
-            if (!workflow.HasExceptionHander)
+            if (!processor.Workflow.HasExceptionHander)
             {
-                workflow.OnException(ExceptionHandler);
+                processor.Workflow.OnException(ExceptionHandler);
             }
 
             // Setup listener.
@@ -117,15 +128,6 @@ namespace WebServer
         public void Stop()
         {
             _listener.Stop();
-        }
-
-        /// <summary>
-        /// Gets the request process workflow.
-        /// </summary>
-        /// <returns>workflow</returns>
-        public Workflow<IWebServerContext> GetWorkflow()
-        {
-            return _workflow ?? (_workflow = new Workflow<IWebServerContext>());
         }
 
         /// <summary>

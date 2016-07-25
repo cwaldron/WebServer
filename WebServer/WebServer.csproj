@@ -40,14 +40,18 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Application\IApplication.cs" />
     <Compile Include="Application\ApplicationLocator.cs" />
     <Compile Include="Application\ApplicationHost.cs" />
     <Compile Include="Application\Application.cs" />
     <Compile Include="Content\FileLoader.cs" />
     <Compile Include="Content\PageLoader.cs" />
     <Compile Include="Content\ImageLoader.cs" />
+    <Compile Include="Routing\RouteCollection.cs" />
+    <Compile Include="Routing\RouteParameter.cs" />
+    <Compile Include="SingletonBase.cs" />
     <Compile Include="Routing\RouteVerb.cs" />
-    <Compile Include="WebServerModule.cs" />
+    <Compile Include="Application\ApplicationModule.cs" />
     <Compile Include="Routing\RouteParser.cs" />
     <Compile Include="Routing\RouteData.cs" />
     <Compile Include="Routing\ConstantNode.cs" />
