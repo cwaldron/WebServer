@@ -60,23 +60,24 @@ namespace WebServer
         IReadOnlyDictionary<string, string> GetRequestHeaders();
 
         /// <summary> 
-        /// Returns the verb of the request: GET, POST, PUT, DELETE, and so forth.
-        /// </summary>
-        string GetRequestVerb();
-
-        /// <summary> 
         /// Returns a dictionary of the parameters on the URL.
         /// </summary>
         IReadOnlyDictionary<string, string> GetQueryParameters();
 
+        /// <summary> 
+        /// Returns the method name of the request: GET, POST, PUT, DELETE, and so forth.
+        /// </summary>
+        string GetRequestMethod();
 
+        /// <summary> 
+        /// Returns the web request.
+        /// </summary>
+        IWebRequest GetRequest();
 
         /// <summary>
         /// 
         /// </summary>
         /// <param name="repsonse"></param>
         void SendResponseText(string repsonse);
-
-
     }
 }

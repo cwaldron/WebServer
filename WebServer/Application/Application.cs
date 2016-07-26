@@ -37,6 +37,14 @@ namespace WebServer.Application
             throw new NotImplementedException();
         }
 
+        public void HandleRequest(IWebRequest request)
+        {
+            Console.WriteLine(@"Handle the request.");
+            // Route the request.
+            // Call the module.
+            // Return the result.
+        }
+
         #endregion
 
         #region IDisposable Members

@@ -1,6 +1,6 @@
 ﻿namespace WebServer.Routing
 {
-    public enum RouteVerb
+    public enum RouteMethod
     {
         Delete,
         Get,

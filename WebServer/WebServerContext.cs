@@ -93,9 +93,9 @@ namespace WebServer
         }
 
         /// <summary> 
-        /// Returns the verb of the request: GET, POST, PUT, DELETE, and so forth.
+        /// Returns the method of the request: GET, POST, PUT, DELETE, and so forth.
         /// </summary>
-        public string GetRequestVerb()
+        public string GetRequestMethod()
         {
             return HttpContext.Request.HttpMethod.ToUpper();
         }
@@ -106,6 +106,14 @@ namespace WebServer
         public IReadOnlyDictionary<string, string> GetQueryParameters()
         {
             return HttpUtility.ParseQueryString(HttpContext.Request.Url.Query);
+        }
+
+        /// <summary> 
+        /// Returns the web request.
+        /// </summary>
+        public IWebRequest GetRequest()
+        {
+            return new WebRequest(this);
         }
 
         /// <summary>

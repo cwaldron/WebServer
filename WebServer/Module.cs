@@ -6,11 +6,11 @@ namespace WebServer
     {
         protected Module()
         {
-            Get = new MethodSet<T>(RouteVerb.Get.ToString().ToUpperInvariant());
-            Put = new MethodSet<T>(RouteVerb.Put.ToString().ToUpperInvariant());
-            Post = new MethodSet<T>(RouteVerb.Post.ToString().ToUpperInvariant());
-            Patch = new MethodSet<T>(RouteVerb.Patch.ToString().ToUpperInvariant());
-            Delete = new MethodSet<T>(RouteVerb.Delete.ToString().ToUpperInvariant());
+            Get = new MethodSet<T>(RouteMethod.Get.ToString().ToUpperInvariant());
+            Put = new MethodSet<T>(RouteMethod.Put.ToString().ToUpperInvariant());
+            Post = new MethodSet<T>(RouteMethod.Post.ToString().ToUpperInvariant());
+            Patch = new MethodSet<T>(RouteMethod.Patch.ToString().ToUpperInvariant());
+            Delete = new MethodSet<T>(RouteMethod.Delete.ToString().ToUpperInvariant());
         }
 
         public void Initialize()

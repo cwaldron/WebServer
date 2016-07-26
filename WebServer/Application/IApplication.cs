@@ -22,5 +22,10 @@ namespace WebServer.Application
         /// Get the environment instance.
         /// </summary>
         void GetEnvironment();
+
+        /// <summary>
+        /// Get the environment instance.
+        /// </summary>
+        void HandleRequest(IWebRequest request);
     }
 }
