@@ -9,7 +9,6 @@ namespace WebServer.Routing
         private readonly RouteCollection _routes;
         private readonly ModuleCollection _modules;
 
-
         private Router()
         {
             _routes = new RouteCollection();
@@ -18,12 +17,17 @@ namespace WebServer.Routing
 
         public void RegisterRoute(RouteEntry route)
         {
-            
+            _routes.Add(route);
         }
 
-        public static void RegisterModule(ApplicationModule module)
+        public void RegisterModule(ApplicationModule module)
         {
-            Instance._modules.Add(module);
+            if (_modules.Contains(module)) return;
+            _modules.Add(module);
+            foreach (var route in module.Setters.SelectMany(setter => setter.Routes))
+            {
+                Instance.RegisterRoute(route);
+            }
         }
 
         public RouteGraph ResolveRoute(RouteEntry route)

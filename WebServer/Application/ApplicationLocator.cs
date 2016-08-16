@@ -1,7 +1,5 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Linq;
-using System.Reflection;
 using WebServer.Routing;
 
 namespace WebServer.Application
@@ -38,7 +36,7 @@ namespace WebServer.Application
                 // Module types found.
                 foreach (var type in modules)
                 {
-                    Router.RegisterModule((ApplicationModule)Activator.CreateInstance(type));
+                    Router.Instance.RegisterModule((ApplicationModule)Activator.CreateInstance(type));
                 }
             }
 

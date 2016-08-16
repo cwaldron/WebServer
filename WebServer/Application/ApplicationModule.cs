@@ -1,4 +1,5 @@
-﻿using WebServer.Routing;
+﻿using System.Collections.Generic;
+using WebServer.Routing;
 
 namespace WebServer.Application
 {
@@ -6,11 +7,21 @@ namespace WebServer.Application
     {
         protected ApplicationModule()
         {
-            Get = new MethodSet(RouteMethod.Get.ToString().ToUpperInvariant(), this);
-            Put = new MethodSet(RouteMethod.Put.ToString().ToUpperInvariant(), this);
-            Post = new MethodSet(RouteMethod.Post.ToString().ToUpperInvariant(), this);
-            Patch = new MethodSet(RouteMethod.Patch.ToString().ToUpperInvariant(), this);
-            Delete = new MethodSet(RouteMethod.Delete.ToString().ToUpperInvariant(), this);
+            var setters = new[]
+            {
+                new MethodSet(RouteMethod.Get.ToString().ToUpperInvariant()),
+                new MethodSet(RouteMethod.Post.ToString().ToUpperInvariant()),
+                new MethodSet(RouteMethod.Put.ToString().ToUpperInvariant()),
+                new MethodSet(RouteMethod.Patch.ToString().ToUpperInvariant()),
+                new MethodSet(RouteMethod.Delete.ToString().ToUpperInvariant())
+            };
+
+            Get = setters[(int)RouteMethod.Get];
+            Post = setters[(int)RouteMethod.Post];
+            Put = setters[(int)RouteMethod.Put];
+            Patch = setters[(int)RouteMethod.Patch];
+            Delete = setters[(int)RouteMethod.Delete];
+            Setters = setters;
         }
 
         public void Initialize()
@@ -31,5 +42,7 @@ namespace WebServer.Application
         public MethodSet Patch { get; }
 
         public MethodSet Delete { get; }
+
+        internal IEnumerable<MethodSet> Setters { get; }
     }
 }

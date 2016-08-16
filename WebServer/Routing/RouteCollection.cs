@@ -1,17 +1,30 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
+using WebServer.Application;
 
 namespace WebServer.Routing
 {
-    public class RouteCollection : IEnumerable<RouteEntry>
+    public class RouteCollection : ICollection<RouteEntry>
     {
-        private readonly ConcurrentDictionary<string, RouteEntry> _routeEntries;
+        private readonly ConcurrentDictionary<Guid, RouteEntry> _routeEntries;
+        private readonly ApplicationModule _module;
+
+        public int Count => _routeEntries.Count;
+
+        public bool IsReadOnly => false;
 
         public RouteCollection()
         {
-            _routeEntries = new ConcurrentDictionary<string, RouteEntry>();
+            _routeEntries = new ConcurrentDictionary<Guid, RouteEntry>();
+        }
+
+        public RouteCollection(ApplicationModule module)
+            : this()
+        {
+            _module = module;
         }
 
         /// <summary>
@@ -36,6 +49,32 @@ namespace WebServer.Routing
         IEnumerator IEnumerable.GetEnumerator()
         {
             return GetEnumerator();
+        }
+
+        public void Add(RouteEntry item)
+        {
+            _routeEntries.AddOrUpdate(item.Id, item, (k, v) => item);
+        }
+
+        public void Clear()
+        {
+            _routeEntries.Clear();
+        }
+
+        public bool Contains(RouteEntry item)
+        {
+            return _routeEntries.ContainsKey(item.Id);
+        }
+
+        public void CopyTo(RouteEntry[] array, int arrayIndex)
+        {
+            throw new System.NotImplementedException();
+        }
+
+        public bool Remove(RouteEntry item)
+        {
+            RouteEntry prevItem;
+            return _routeEntries.TryRemove(item.Id, out prevItem);
         }
     }
 }

@@ -8,17 +8,13 @@ namespace WebServer.Routing
     {
         private readonly List<Func<GraphNode>> _bindings = new List<Func<GraphNode>>();
 
-        private readonly List<RouteEntry> _routeCollection;
-
         public string Method { get; }
+        public RouteCollection Routes { get; }
 
-        public ApplicationModule Module { get; }
-
-        internal MethodSet(string method, ApplicationModule module)
+        internal MethodSet(string method)
         {
             Method = method;
-            Module = module;
-            _routeCollection = new List<RouteEntry>();
+            Routes = new RouteCollection();
         }
 
         public Func<RouteData, object> this[string s]
@@ -26,8 +22,8 @@ namespace WebServer.Routing
             // ReSharper disable once ValueParameterNotUsed
             set
             {
-                var route = new RouteEntry(Module, Method, s);
-                _routeCollection.Add(route);
+                var route = new RouteEntry(Method, value, s);
+                Routes.Add(route);
             }
         }
 

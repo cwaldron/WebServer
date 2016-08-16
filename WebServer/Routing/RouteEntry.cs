@@ -1,4 +1,5 @@
-﻿using WebServer.Application;
+﻿using System;
+using WebServer.Application;
 
 namespace WebServer.Routing
 {
@@ -9,17 +10,20 @@ namespace WebServer.Routing
             
         }
 
-        public RouteEntry(ApplicationModule module, string method, string pattern, object defaults = null)
+        public RouteEntry(string method, Func<RouteData, object> action, string pattern, object defaults = null)
         {
-            Module = module;
+            Id = Guid.NewGuid();
             Method = method;
+            Action = action;
             Pattern = pattern;
             Defaults = defaults;
         }
 
-        public ApplicationModule Module { get; }
+        public Guid Id { get; }
 
         public string Method { get; }
+
+        public Func<RouteData, object> Action { get; }
 
         public string Pattern { get; }
 
