@@ -56,6 +56,10 @@
     <None Include="App.config" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\ServerApp\ServerApp.csproj">
+      <Project>{c42f2ea9-9666-46b6-9d61-ccd6d4aed261}</Project>
+      <Name>ServerApp</Name>
+    </ProjectReference>
     <ProjectReference Include="..\ServerHost\ServerHost.csproj">
       <Project>{2fc60c8a-80de-459b-960e-2b0e7ea970ac}</Project>
       <Name>ServerHost</Name>

@@ -1,49 +1,37 @@
 ﻿using System;
 using System.Collections.Generic;
+using WebServer.Application;
 
 namespace WebServer.Routing
 {
-    public class MethodSet<T> where T : RouteData
+    public class MethodSet
     {
         private readonly List<Func<GraphNode>> _bindings = new List<Func<GraphNode>>();
 
-        //private readonly List<FinalFunction> _baseFinals = new List<FinalFunction>();
+        private readonly List<RouteEntry> _routeCollection;
 
-        private readonly string _method;
+        public string Method { get; }
 
-        //private IRouteEngine _engine;
+        public ApplicationModule Module { get; }
 
-        //private IStringRouteParser _parser;
-
-        public MethodSet(string method)
+        internal MethodSet(string method, ApplicationModule module)
         {
-            _method = method;
+            Method = method;
+            Module = module;
+            _routeCollection = new List<RouteEntry>();
         }
 
-
-        public Func<T, object> this[string s]
+        public Func<RouteData, object> this[string s]
         {
+            // ReSharper disable once ValueParameterNotUsed
             set
             {
-                if (s == "/")
-                {
-                    //_baseFinals.Add(new ExclusiveFinalFunction(f => value(f), new MethodFilter(_method)));
-
-                }
-                else
-                {
-                    //_bindings.Add(
-                    //    () =>
-                    //    {
-                    //        var node = _parser.MapToGraph(s);
-                    //        node.FinalFunctions.Add(new ExclusiveFinalFunction(f => value(f), new MethodFilter(_method)));
-                    //        return node;
-                    //    });
-                }
+                var route = new RouteEntry(Module, Method, s);
+                _routeCollection.Add(route);
             }
         }
 
-        public Func<T, object> this[GraphNode s]
+        public Func<RouteData, object> this[GraphNode s]
         {
             set
             {

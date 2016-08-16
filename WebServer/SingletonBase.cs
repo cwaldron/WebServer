@@ -25,6 +25,15 @@ namespace WebServer
 
         #endregion
 
+        #region Properties
+
+        /// <summary>
+        /// Obtain the current instance.
+        /// </summary>
+        public static T Current => Instance;
+
+        #endregion
+
         #region Helpers
 
         /// <summary>
@@ -37,10 +46,10 @@ namespace WebServer
         {
             get
             {
-                if (_singleton != null) return (T) _singleton;
+                if (_singleton != null) return (T)_singleton;
                 lock (SyncRoot)
                 {
-                    _singleton = (T) Activator.CreateInstance(typeof(T), true);
+                    _singleton = (T)Activator.CreateInstance(typeof(T), true);
                 }
 
                 return (T)_singleton;

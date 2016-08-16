@@ -4,3 +4,6 @@ WebServer/obj/
 ServerMain/obj/
 ServerMain/bin/
 ServerHost/obj/
+ServerHost/bin/
+WebServer/bin/
+*.suo

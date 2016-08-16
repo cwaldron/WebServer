@@ -23,8 +23,8 @@ namespace WebServer.Routing
         /// <returns>A reference to the mapped route.</returns>
         public RouteCollection MapRoute(string name, string routeTemplate, object defaults = null)
         {
-            var entry = new RouteEntry(name, routeTemplate, defaults);
-            _routeEntries.AddOrUpdate(name, entry, (k, v) => entry);
+            //var entry = new RouteEntry(name, routeTemplate, defaults);
+            //_routeEntries.AddOrUpdate(name, entry, (k, v) => entry);
             return this;
         }
 

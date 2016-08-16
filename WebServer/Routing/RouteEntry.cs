@@ -1,17 +1,27 @@
-﻿namespace WebServer.Routing
+﻿using WebServer.Application;
+
+namespace WebServer.Routing
 {
     public class RouteEntry
     {
-        public RouteEntry(string name, string routeTemplate, object defaults)
+        public RouteEntry(string protocol)
         {
-            Name = name;
-            Template = routeTemplate;
+            
+        }
+
+        public RouteEntry(ApplicationModule module, string method, string pattern, object defaults = null)
+        {
+            Module = module;
+            Method = method;
+            Pattern = pattern;
             Defaults = defaults;
         }
 
-        public string Name { get; }
+        public ApplicationModule Module { get; }
 
-        public string Template { get; }
+        public string Method { get; }
+
+        public string Pattern { get; }
 
         public object Defaults { get; }
     }
