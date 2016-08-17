@@ -12,6 +12,8 @@ namespace WebServer.Routing
 
         public bool IsReadOnly => false;
 
+        public RouteEntry Route { get; }
+
         private RouteGraph()
         {
             _graph = new LinkedList<RouteEntry>();
@@ -20,6 +22,7 @@ namespace WebServer.Routing
         public RouteGraph(RouteEntry route)
             : this()
         {
+            Route = route;
             BuildGraph(route);
         }
 
@@ -33,6 +36,16 @@ namespace WebServer.Routing
         public RouteGraph PatternMatch(RouteEntry route)
         {
             return null;
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="path"></param>
+        /// <returns></returns>
+        public bool PatternMatch(string path)
+        {
+            return true;
         }
 
         public IEnumerator<RouteEntry> GetEnumerator()

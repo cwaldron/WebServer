@@ -62,6 +62,15 @@ namespace WebServer.Application
         // Find the route that matches the request.
         private RouteEntry FindRequestRoute(IWebRequest request)
         {
+            // ReSharper disable once LoopCanBeConvertedToQuery
+            foreach (var route in _routes.SelectMany(x => x))
+            {
+                var graph = new RouteGraph(route);
+                if (graph.PatternMatch(request.Path))
+                {
+                    return graph.Route;
+                }
+            }
             return null;
         }
 
