@@ -26,7 +26,18 @@ namespace WebServer
         /// <summary>
         /// Gets the web application.
         /// </summary>
-        public IApplication Application => _application ?? (_application = ApplicationLocator.FindApplication());
+        public IApplication Application
+        {
+            get
+            {
+                if (_application == null)
+                {
+                    var locator = new ApplicationLocator();
+                    _application = locator.FindApplication();
+                }
+                return _application;
+            }
+        }
 
         /// <summary>
         /// Determines if the webserver is listening for requests.

@@ -1,46 +1,61 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Linq;
-using WebServer.Routing;
 
 namespace WebServer.Application
 {
     /// <summary>
     /// Application bootstrapper.
     /// </summary>
-    public class ApplicationLocator : SingletonBase<ApplicationLocator>
+    public class ApplicationLocator
     {
-        private IApplication _application;
-
-        public static IApplication Application => Instance._application ?? FindApplication();
-
-        private ApplicationLocator()
+        public IApplication FindApplication()
         {
+            return FindApplication(FindApplicationInternal);
         }
 
-        public static IApplication FindApplication()
+        public IEnumerable<ApplicationModule> FindModules()
         {
-            return FindApplication(DefaultLocater);
+            return FindModules(FindModulesInternal);
         }
 
-        private static IApplication FindApplication(Func<IApplication> locater)
+        public IApplication FindApplication(Func<IApplication> locater)
         {
-            Instance._application = locater();
-            return Instance._application;
+            return locater();
         }
 
-        private static IApplication DefaultLocater()
+        public IEnumerable<ApplicationModule> FindModules(Func<IEnumerable<ApplicationModule>> locater)
         {
+            return locater();
+        }
+
+        private static IApplication FindApplicationInternal()
+        {
+            // Get assemblies.
             var assems = AppDomain.CurrentDomain.GetAssemblies();
-            foreach (var modules in assems.Select(assem => assem.GetTypes().Where(x => x.IsSubclassOf(typeof(ApplicationModule)))))
+
+            // Load application.
+            // ReSharper disable once PossibleMultipleEnumeration
+            Type appType = assems.Select(assem => assem.GetTypes().Where(x => x.IsSubclassOf(typeof(Application)))).SelectMany(y => y).Single();
+            return (IApplication)Activator.CreateInstance(appType);
+        }
+
+
+        private static ModuleCollection FindModulesInternal()
+        {
+            // Get assemblies.
+            var assems = AppDomain.CurrentDomain.GetAssemblies();
+
+            // Load modules.
+            var modules = new ModuleCollection();
+            // ReSharper disable once PossibleMultipleEnumeration
+            foreach (Type moduleType in assems.Select(assem => assem.GetTypes().Where(x => x.IsSubclassOf(typeof(ApplicationModule)))).SelectMany(y => y))
             {
                 // Module types found.
-                foreach (var type in modules)
-                {
-                    Router.Instance.RegisterModule((ApplicationModule)Activator.CreateInstance(type));
-                }
+                modules.Add((ApplicationModule)Activator.CreateInstance(moduleType));
             }
 
-            return null;
+            return modules;
         }
     }
 }

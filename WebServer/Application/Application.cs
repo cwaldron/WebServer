@@ -10,6 +10,8 @@ namespace WebServer.Application
     {
         #region Private Members
 
+        private readonly RouteCollection _routes;
+        private readonly ModuleCollection _modules;
         private bool _disposed;
 
         #endregion
@@ -18,6 +20,9 @@ namespace WebServer.Application
 
         protected Application()
         {
+            var locator = new ApplicationLocator();
+            _modules = (ModuleCollection) locator.FindModules();
+            _routes = new RouteCollection();
             Routes = new RouteCollection();
         }
 
@@ -26,6 +31,8 @@ namespace WebServer.Application
         #region Methods
 
         public RouteCollection Routes { get; }
+
+        internal ModuleCollection Modules { get; set; }
 
         public virtual void Startup()
         {
@@ -46,6 +53,12 @@ namespace WebServer.Application
         }
 
         #endregion
+
+        #region Helpers
+
+
+        #endregion
+
 
         #region IDisposable Members
 

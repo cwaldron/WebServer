@@ -18,8 +18,8 @@ namespace ServerHost
         #region Constructors
 
         public WebHost(params string[] urls)
+            : this(new ApplicationLocator().FindApplication(), urls)
         {
-            _server = new WebServer.WebServer(new RequestProcessor(ApplicationLocator.FindApplication()), urls);
         }
 
         public WebHost(IApplication app, params string[] urls)

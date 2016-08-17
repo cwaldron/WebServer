@@ -26,8 +26,7 @@ namespace ServerHost
         public RequestProcessor(IApplication application)
         {
             // Obtain and start the application.
-            Application = application ?? ApplicationLocator.FindApplication();
-            Application?.Startup();
+            application.Startup();
 
             // Setup server workflow.
             Workflow = new Workflow<IWebServerContext>()
