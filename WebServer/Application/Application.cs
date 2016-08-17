@@ -1,4 +1,6 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.Linq;
 using WebServer.Routing;
 
 namespace WebServer.Application
@@ -10,7 +12,7 @@ namespace WebServer.Application
     {
         #region Private Members
 
-        private readonly RouteCollection _routes;
+        private readonly List<RouteCollection> _routes;
         private readonly ModuleCollection _modules;
         private bool _disposed;
 
@@ -22,7 +24,8 @@ namespace WebServer.Application
         {
             var locator = new ApplicationLocator();
             _modules = (ModuleCollection) locator.FindModules();
-            _routes = new RouteCollection();
+            _routes = _modules.Select(module => new RouteCollection(module)).ToList();
+
             Routes = new RouteCollection();
         }
 
@@ -53,12 +56,6 @@ namespace WebServer.Application
         }
 
         #endregion
-
-        #region Helpers
-
-
-        #endregion
-
 
         #region IDisposable Members
 
