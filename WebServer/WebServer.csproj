@@ -49,6 +49,7 @@
     <Compile Include="Content\ImageLoader.cs" />
     <Compile Include="IWebRequest.cs" />
     <Compile Include="Routing\LinkedList.cs" />
+    <Compile Include="Routing\RouteSegment.cs" />
     <Compile Include="Routing\RouteEntry.cs" />
     <Compile Include="Application\ModuleCollection.cs" />
     <Compile Include="Routing\RouteGraph.cs" />

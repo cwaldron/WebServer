@@ -4,9 +4,9 @@ using System.Collections.Generic;
 
 namespace WebServer.Routing
 {
-    internal class RouteGraph : ICollection<RouteEntry>
+    internal class RouteGraph : ICollection<RouteSegment>
     {
-        private readonly LinkedList<RouteEntry> _graph;
+        private readonly LinkedList<RouteSegment> _graph;
 
         public int Count => _graph.Count;
 
@@ -16,7 +16,7 @@ namespace WebServer.Routing
 
         private RouteGraph()
         {
-            _graph = new LinkedList<RouteEntry>();
+            _graph = new LinkedList<RouteSegment>();
         }
 
         public RouteGraph(RouteEntry route)
@@ -33,7 +33,7 @@ namespace WebServer.Routing
         /// </summary>
         /// <param name="route"></param>
         /// <returns></returns>
-        public RouteGraph PatternMatch(RouteEntry route)
+        public RouteGraph PatternMatch(RouteSegment route)
         {
             return null;
         }
@@ -48,7 +48,7 @@ namespace WebServer.Routing
             return true;
         }
 
-        public IEnumerator<RouteEntry> GetEnumerator()
+        public IEnumerator<RouteSegment> GetEnumerator()
         {
             return _graph.GetEnumerator();
         }
@@ -58,7 +58,7 @@ namespace WebServer.Routing
             return GetEnumerator();
         }
 
-        public void Add(RouteEntry item)
+        public void Add(RouteSegment item)
         {
             _graph.Add(item);
         }
@@ -68,17 +68,17 @@ namespace WebServer.Routing
             _graph.Clear();
         }
 
-        public bool Contains(RouteEntry item)
+        public bool Contains(RouteSegment item)
         {
             return _graph.Contains(item);
         }
 
-        public void CopyTo(RouteEntry[] array, int arrayIndex)
+        public void CopyTo(RouteSegment[] array, int arrayIndex)
         {
             _graph.CopyTo(array, arrayIndex);
         }
 
-        public bool Remove(RouteEntry item)
+        public bool Remove(RouteSegment item)
         {
             return _graph.Remove(item);
         }
