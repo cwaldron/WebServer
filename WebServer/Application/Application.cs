@@ -35,7 +35,7 @@ namespace WebServer.Application
 
         public RouteCollection Routes { get; }
 
-        internal ModuleCollection Modules { get; set; }
+        //internal ModuleCollection Modules { get; set; }
 
         public virtual void Startup()
         {
@@ -50,9 +50,19 @@ namespace WebServer.Application
         public void HandleRequest(IWebRequest request)
         {
             Console.WriteLine(@"Handle the request.");
-            // Route the request.
+            var routes = FindRequestRoute(request);
             // Call the module.
             // Return the result.
+        }
+
+        #endregion
+
+        #region Helpers
+
+        // Find the route that matches the request.
+        private RouteEntry FindRequestRoute(IWebRequest request)
+        {
+            return null;
         }
 
         #endregion

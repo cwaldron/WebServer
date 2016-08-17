@@ -16,7 +16,7 @@ namespace WebServer.Routing
 
         public bool IsReadOnly => false;
 
-        public RouteCollection()
+        internal RouteCollection()
         {
             _routeEntries = new ConcurrentDictionary<Guid, RouteEntry>();
         }
@@ -25,6 +25,10 @@ namespace WebServer.Routing
             : this()
         {
             _module = module;
+            foreach (var route in module.Setters.SelectMany(setter => setter.Routes))
+            {
+                Add(route);
+            }
         }
 
         /// <summary>
@@ -68,7 +72,7 @@ namespace WebServer.Routing
 
         public void CopyTo(RouteEntry[] array, int arrayIndex)
         {
-            throw new System.NotImplementedException();
+            throw new NotImplementedException();
         }
 
         public bool Remove(RouteEntry item)
