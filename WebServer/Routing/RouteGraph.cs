@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections;
+﻿using System.Collections;
 using System.Collections.Generic;
 
 namespace WebServer.Routing
@@ -89,8 +88,11 @@ namespace WebServer.Routing
 
         private void BuildGraph(RouteEntry route)
         {
-            Console.WriteLine(route.Method);
-            Console.WriteLine(route.Pattern);
+            var parts = route.Pattern.TrimEnd('/').Split('/');
+            foreach (var part in parts)
+            {
+                _graph.Add(new RouteSegment(part));
+            }
         }
 
         #endregion
