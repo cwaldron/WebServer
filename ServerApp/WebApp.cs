@@ -9,18 +9,19 @@ namespace ServerApp
         public override void Startup()
         {
             Routes.MapRoute(
-                name: "BlogPostMediaRoute",
-                routeTemplate: "sites/{siteId}/blog/posts/{postId}/media/{id}",
+                method: "get",
+                pattern: "sites/{siteId}/blog/posts/{postId}/media/{id}",
                 defaults: new {controller = "blogpostmedia", id = RouteParameter.Optional})
 
+
             .MapRoute(
-                name: "BlogTagsRoute",
-                routeTemplate: "sites/{siteId}/blog/tags",
+                method: "get",
+                pattern: "sites/{siteId}/blog/tags",
                 defaults: new { controller = "blogtags" })
 
             .MapRoute(
-                name: "TagsRoute",
-                routeTemplate: "sites/{siteId}/tags",
+                method: "get",
+                pattern: "sites/{siteId}/tags",
                 defaults: new { controller = "tags" });
         }
 

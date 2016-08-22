@@ -25,7 +25,6 @@ namespace WebServer.Application
             var locator = new ApplicationLocator();
             _modules = (ModuleCollection) locator.FindModules();
             _routes = _modules.Select(module => new RouteCollection(module)).ToList();
-
             Routes = new RouteCollection();
         }
 

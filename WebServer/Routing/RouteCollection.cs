@@ -34,14 +34,13 @@ namespace WebServer.Routing
         /// <summary>
         /// Maps the specified route template and sets default route values.
         /// </summary>
-        /// <param name="name">The name of the route to map.</param>
-        /// <param name="routeTemplate">The route template for the route.</param>
+        /// <param name="method">The name of the route to map.</param>
+        /// <param name="pattern">The matching route pattern.</param>
         /// <param name="defaults">An object that contains default route values.</param>
         /// <returns>A reference to the mapped route.</returns>
-        public RouteCollection MapRoute(string name, string routeTemplate, object defaults = null)
+        public RouteCollection MapRoute(string method, string pattern, object defaults = null)
         {
-            //var entry = new RouteEntry(name, routeTemplate, defaults);
-            //_routeEntries.AddOrUpdate(name, entry, (k, v) => entry);
+            Add(new RouteEntry(method, null, pattern, defaults));
             return this;
         }
 

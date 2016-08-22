@@ -10,6 +10,13 @@ namespace WebServer.Routing
             
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="method"></param>
+        /// <param name="action"></param>
+        /// <param name="pattern"></param>
+        /// <param name="defaults"></param>
         public RouteEntry(string method, Func<RouteData, object> action, string pattern, object defaults = null)
         {
             Id = Guid.NewGuid();
