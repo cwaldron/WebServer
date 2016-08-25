@@ -42,10 +42,9 @@ namespace WebServer.Routing
 
         public object Defaults { get; }
 
-
         public bool Match(RouteEntry entry)
         {
-            return true;
+            return _graph.Match(entry._graph);
         }
     }
 }

@@ -28,21 +28,11 @@ namespace WebServer.Routing
         #region Methods
 
         /// <summary>
-        /// Match the route pattern to the route.
-        /// </summary>
-        /// <param name="route"></param>
-        /// <returns></returns>
-        public RouteGraph PatternMatch(RouteSegment route)
-        {
-            return null;
-        }
-
-        /// <summary>
         /// 
         /// </summary>
-        /// <param name="path"></param>
+        /// <param name="graph"></param>
         /// <returns></returns>
-        public bool PatternMatch(string path)
+        public bool Match(RouteGraph graph)
         {
             return true;
         }
