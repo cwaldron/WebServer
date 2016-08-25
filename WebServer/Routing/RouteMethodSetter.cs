@@ -3,34 +3,33 @@ using System.Collections.Generic;
 
 namespace WebServer.Routing
 {
-    public class MethodSet
+    /// <summary>
+    /// The setter class for routing methods.
+    /// </summary>
+    public class RouteMethodSetter
     {
         private readonly List<Func<GraphNode>> _bindings = new List<Func<GraphNode>>();
 
         public string Method { get; }
         public RouteCollection Routes { get; }
 
-        internal MethodSet(string method)
+        internal RouteMethodSetter(string method)
         {
             Method = method;
             Routes = new RouteCollection();
         }
 
-        public Func<RouteData, object> this[string s]
+        /// <summary>
+        /// Route method setter.
+        /// </summary>
+        /// <param name="route">route string</param>
+        /// <returns></returns>
+        public Func<RouteData, object> this[string route]
         {
             // ReSharper disable once ValueParameterNotUsed
             set
             {
-                Routes.MapRoute(Method, value, s);
-            }
-        }
-
-        public Func<RouteData, object> this[GraphNode s]
-        {
-            set
-            {
-                s = s*(f => value(f));
-                _bindings.Add(() => s.Base());
+                Routes.MapRoute(Method, value, route);
             }
         }
 

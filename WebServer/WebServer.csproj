@@ -62,7 +62,7 @@
     <Compile Include="Routing\RouteData.cs" />
     <Compile Include="Routing\ConstantNode.cs" />
     <Compile Include="Routing\GraphNode.cs" />
-    <Compile Include="Routing\MethodSet.cs" />
+    <Compile Include="Routing\RouteMethodSetter.cs" />
     <Compile Include="Sessions\Converter.cs" />
     <Compile Include="Sessions\Cookie.cs" />
     <Compile Include="Application\ApplicationModule.cs" />

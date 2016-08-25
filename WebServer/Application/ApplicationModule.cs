@@ -9,11 +9,11 @@ namespace WebServer.Application
         {
             var setters = new[]
             {
-                new MethodSet(RouteMethod.Get.ToString().ToUpperInvariant()),
-                new MethodSet(RouteMethod.Post.ToString().ToUpperInvariant()),
-                new MethodSet(RouteMethod.Put.ToString().ToUpperInvariant()),
-                new MethodSet(RouteMethod.Patch.ToString().ToUpperInvariant()),
-                new MethodSet(RouteMethod.Delete.ToString().ToUpperInvariant())
+                new RouteMethodSetter(RouteMethod.Get.ToString().ToUpperInvariant()),
+                new RouteMethodSetter(RouteMethod.Post.ToString().ToUpperInvariant()),
+                new RouteMethodSetter(RouteMethod.Put.ToString().ToUpperInvariant()),
+                new RouteMethodSetter(RouteMethod.Patch.ToString().ToUpperInvariant()),
+                new RouteMethodSetter(RouteMethod.Delete.ToString().ToUpperInvariant())
             };
 
             Get = setters[(int)RouteMethod.Get];
@@ -33,16 +33,16 @@ namespace WebServer.Application
             Delete.Initialize();
         }
 
-        public MethodSet Get { get; }
+        public RouteMethodSetter Get { get; }
 
-        public MethodSet Put { get; }
+        public RouteMethodSetter Put { get; }
 
-        public MethodSet Post { get; }
+        public RouteMethodSetter Post { get; }
 
-        public MethodSet Patch { get; }
+        public RouteMethodSetter Patch { get; }
 
-        public MethodSet Delete { get; }
+        public RouteMethodSetter Delete { get; }
 
-        internal IEnumerable<MethodSet> Setters { get; }
+        internal IEnumerable<RouteMethodSetter> Setters { get; }
     }
 }
