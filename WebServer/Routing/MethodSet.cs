@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using WebServer.Application;
 
 namespace WebServer.Routing
 {
@@ -22,8 +21,7 @@ namespace WebServer.Routing
             // ReSharper disable once ValueParameterNotUsed
             set
             {
-                var route = new RouteEntry(Method, value, s);
-                Routes.Add(route);
+                Routes.MapRoute(Method, value, s);
             }
         }
 

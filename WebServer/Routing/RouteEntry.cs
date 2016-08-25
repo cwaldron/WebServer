@@ -5,9 +5,14 @@ namespace WebServer.Routing
 {
     public class RouteEntry
     {
+        private readonly RouteGraph _graph;
+
+
         public RouteEntry(string protocol)
         {
-            
+            Id = Guid.NewGuid();
+            Pattern = protocol;
+            _graph = new RouteGraph(this);
         }
 
         /// <summary>
@@ -24,6 +29,7 @@ namespace WebServer.Routing
             Action = action;
             Pattern = pattern;
             Defaults = defaults;
+            _graph = new RouteGraph(this);
         }
 
         public Guid Id { get; }
@@ -35,5 +41,11 @@ namespace WebServer.Routing
         public string Pattern { get; }
 
         public object Defaults { get; }
+
+
+        public bool Match(RouteEntry entry)
+        {
+            return true;
+        }
     }
 }

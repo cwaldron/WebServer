@@ -10,6 +10,11 @@ namespace WebServer
             return dateTime.ToUniversalTime().ToString("r");
         }
 
+        public static bool IsDefault<T>(this T value) where T : struct
+        {
+            return value.Equals(default(T));
+        }
+    
         /// <summary>
         /// Add value to the dictionary.
         /// </summary>
