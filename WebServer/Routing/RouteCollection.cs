@@ -64,6 +64,16 @@ namespace WebServer.Routing
             return !found.IsDefault() ? found.Value : null;
         }
 
+        public IEnumerator<RouteEntry> GetEnumerator()
+        {
+            return _routeEntries.Select(pair => pair.Value).GetEnumerator();
+        }
+
+        IEnumerator IEnumerable.GetEnumerator()
+        {
+            return GetEnumerator();
+        }
+
         #endregion
 
         #region Helpers
@@ -90,15 +100,5 @@ namespace WebServer.Routing
         }
 
         #endregion
-
-        public IEnumerator<RouteEntry> GetEnumerator()
-        {
-            return _routeEntries.Select(pair => pair.Value).GetEnumerator();
-        }
-
-        IEnumerator IEnumerable.GetEnumerator()
-        {
-            return GetEnumerator();
-        }
     }
 }
