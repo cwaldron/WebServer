@@ -34,6 +34,22 @@ namespace WebServer.Routing
         /// <returns></returns>
         public bool Match(RouteGraph graph)
         {
+            var segment = graph._graph.Next;
+            for (var node = _graph.Next; node != null; node = node.Next, segment = segment.Next)
+            {
+                string sourcePattern = node.Value.Pattern;
+                string targetPattern = segment.Value.Pattern;
+
+                if (sourcePattern == "{controller}")
+                {
+                    if (segment.Value.Method != Route.Method)
+                        return false;
+                }
+
+                if (sourcePattern != targetPattern)
+                    return false;
+            }
+
             return true;
         }
 
